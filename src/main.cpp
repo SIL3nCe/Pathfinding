@@ -14,8 +14,21 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::MouseMoved)
+            {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                {
+                    grid.Onclicked(event.mouseMove.x, event.mouseMove.y);
+                }
+            }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                grid.Onclicked(event.mouseMove.x, event.mouseMove.y);
+            }
+            else if (event.type == sf::Event::Closed)
+            {
                 window.close();
+            }
         }
 
         window.clear();

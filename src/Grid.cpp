@@ -9,11 +9,11 @@ void Grid::Initialize(void)
 		{
 			m_aaGrid[i][j].setSize(sf::Vector2f(CASE_SIZE, CASE_SIZE));
 			m_aaGrid[i][j].setPosition(sf::Vector2f(posX, posY));
-			posX += CASE_SIZE + 1;
+			posX += CASE_SIZE + CASE_SPACE;
 		}
 
 		posX = 0.0f;
-		posY += CASE_SIZE + 1;
+		posY += CASE_SIZE + CASE_SPACE;
 	}
 }
 
@@ -26,4 +26,9 @@ void Grid::Draw(sf::RenderWindow & window)
 			window.draw(m_aaGrid[i][j]);
 		}
 	}
+}
+
+void Grid::Onclicked(int x, int y)
+{
+	printf("%i, %i\n", x, y);
 }

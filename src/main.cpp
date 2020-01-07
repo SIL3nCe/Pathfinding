@@ -1,8 +1,13 @@
 #include <SFML/Graphics.hpp>
 
+#include "Grid.h"
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Pathfinding");
+
+    Grid grid;
+    grid.Initialize();
 
     while (window.isOpen())
     {
@@ -14,6 +19,8 @@ int main()
         }
 
         window.clear();
+
+        grid.Draw(window);
 
         window.display();
     }

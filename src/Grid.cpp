@@ -7,13 +7,12 @@ void Grid::Initialize(void)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			m_aaGrid[i][j].setSize(sf::Vector2f(CASE_SIZE, CASE_SIZE));
-			m_aaGrid[i][j].setPosition(sf::Vector2f(posX, posY));
-			posX += CASE_SIZE + CASE_SPACE;
+			m_aaGrid[i][j].Initialize(CASE_SIZE, CASE_OUTLINE_SIZE, sf::Vector2f(posX, posY));
+			posX += CASE_SIZE;
 		}
 
 		posX = 0.0f;
-		posY += CASE_SIZE + CASE_SPACE;
+		posY += CASE_SIZE;
 	}
 }
 
@@ -23,12 +22,14 @@ void Grid::Draw(sf::RenderWindow & window)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			window.draw(m_aaGrid[i][j]);
+			m_aaGrid[i][j].Draw(window);
 		}
 	}
 }
 
-void Grid::Onclicked(int x, int y)
+void Grid::Onclicked(int posX, int posY)
 {
-	printf("%i, %i\n", x, y);
+	int x = posY / CASE_SIZE;
+	int y = posX / CASE_SIZE;
+	m_aaGrid[x][y].SetState(ECaseState::Wall); // TODO Handle state to set in main (keyboard key to switch between empty/wall ? + drag&drop by default when no key pressed even for walls
 }

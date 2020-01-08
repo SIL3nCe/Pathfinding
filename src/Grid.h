@@ -1,10 +1,10 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include "Case.h"
 
 #define GRID_SIZE 50
 #define CASE_SIZE 20.0f
-#define CASE_SPACE 2
+#define CASE_OUTLINE_SIZE 2
 
 class Grid
 {
@@ -13,9 +13,9 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 	
-	void Onclicked(int x, int y);
+	void Onclicked(int posX, int posY);
 
 private:
-	sf::RectangleShape m_aaGrid[GRID_SIZE][GRID_SIZE];
+	Case m_aaGrid[GRID_SIZE][GRID_SIZE];
 };
 

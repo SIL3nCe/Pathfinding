@@ -14,6 +14,7 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
+            // TODO only click when focus on window
             if (event.type == sf::Event::MouseMoved)
             {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left))

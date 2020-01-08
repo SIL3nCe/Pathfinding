@@ -19,18 +19,18 @@ void Case::Draw(sf::RenderWindow & window)
 
 void Case::SetState(ECaseState eState)
 {
-	m_eState = ECaseState::Wall;
-
-	switch (m_eState)
+	switch (eState)
 	{
 		case ECaseState::Empty:
 		{
-			m_shape.setFillColor(sf::Color::White);
+			if (m_eState != ECaseState::Start && m_eState != ECaseState::End)
+				m_shape.setFillColor(sf::Color::White);
 		}
 		break;
 		case ECaseState::Wall:
 		{
-			m_shape.setFillColor(sf::Color::Black);
+			if (m_eState != ECaseState::Start && m_eState != ECaseState::End)
+				m_shape.setFillColor(sf::Color::Black);
 		}
 		break;
 		case ECaseState::Start:
@@ -43,6 +43,12 @@ void Case::SetState(ECaseState eState)
 			m_shape.setFillColor(sf::Color::Red);
 		}
 		break;
-
 	}
+
+	m_eState = eState;
+}
+
+ECaseState Case::GetState(void)
+{
+	return m_eState;
 }

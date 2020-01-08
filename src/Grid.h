@@ -13,9 +13,12 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 	
-	void Onclicked(int posX, int posY);
+	void OnMouseClicked(int posX, int posY);
+	void OnMouseMoved(int posX, int posY);
 
 private:
 	Case m_aaGrid[GRID_SIZE][GRID_SIZE];
+
+	ECaseState m_eStateToApply;
 };
 

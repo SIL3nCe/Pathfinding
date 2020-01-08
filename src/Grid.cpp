@@ -14,6 +14,8 @@ void Grid::Initialize(void)
 		posX = 0.0f;
 		posY += CASE_SIZE;
 	}
+
+	m_eStateToApply = ECaseState::Empty;
 }
 
 void Grid::Draw(sf::RenderWindow & window)
@@ -27,9 +29,28 @@ void Grid::Draw(sf::RenderWindow & window)
 	}
 }
 
-void Grid::Onclicked(int posX, int posY)
+void Grid::OnMouseClicked(int posX, int posY)
 {
 	int x = posY / CASE_SIZE;
 	int y = posX / CASE_SIZE;
-	m_aaGrid[x][y].SetState(ECaseState::Wall); // TODO Handle state to set in main (keyboard key to switch between empty/wall ? + drag&drop by default when no key pressed even for walls
+
+	m_eStateToApply = m_aaGrid[x][y].GetState();
+
+	if (ECaseState::Wall == m_eStateToApply)
+		m_eStateToApply = ECaseState::Empty;
+	else if (ECaseState::Empty == m_eStateToApply)
+		m_eStateToApply = ECaseState::Wall;
+
+	m_aaGrid[x][y].SetState(m_eStateToApply);
+}
+
+void Grid::OnMouseMoved(int posX, int posY)
+{
+	if (posX < 0 || posY < 0)
+		return;
+
+	int x = posY / CASE_SIZE;
+	int y = posX / CASE_SIZE;
+
+	m_aaGrid[x][y].SetState(m_eStateToApply);
 }

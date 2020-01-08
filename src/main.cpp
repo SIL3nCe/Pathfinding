@@ -14,21 +14,28 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
-            // TODO only click when focus on window
-            if (event.type == sf::Event::MouseMoved)
+            switch (event.type)
             {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                case  sf::Event::MouseButtonPressed:
                 {
-                    grid.Onclicked(event.mouseMove.x, event.mouseMove.y);
+                    grid.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
                 }
-            }
-            else if (event.type == sf::Event::MouseButtonPressed)
-            {
-                grid.Onclicked(event.mouseMove.x, event.mouseMove.y);
-            }
-            else if (event.type == sf::Event::Closed)
-            {
-                window.close();
+                break;
+
+                case sf::Event::MouseMoved:
+                {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                    {
+                        grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
+                    }
+                }
+                break;
+
+                case sf::Event::Closed:
+                {
+                    window.close();
+                }
+                break;
             }
         }
 

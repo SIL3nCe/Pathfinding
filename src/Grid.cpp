@@ -97,3 +97,8 @@ void Grid::OnMouseMoved(int posX, int posY)
 
 	m_aaGrid[x][y].SetState(m_eStateToApply);
 }
+
+void Grid::OnMouseReleased(void)
+{
+	m_eStateToApply = ECaseState::Empty;
+}

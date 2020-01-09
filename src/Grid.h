@@ -17,6 +17,7 @@ public:
 
 	void OnMouseClicked(int posX, int posY);
 	void OnMouseMoved(int posX, int posY);
+	void OnMouseReleased(void);
 
 private:
 	Case m_aaGrid[GRID_SIZE][GRID_SIZE];

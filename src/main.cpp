@@ -4,7 +4,7 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Pathfinding");
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "Pathfinding");
 
     Grid grid;
     grid.Initialize();
@@ -39,6 +39,12 @@ int main()
                     {
                         grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
                     }
+                }
+                break;
+
+                case sf::Event::MouseButtonReleased:
+                {
+                    grid.OnMouseReleased();
                 }
                 break;
 

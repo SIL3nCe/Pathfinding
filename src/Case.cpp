@@ -17,20 +17,24 @@ void Case::Draw(sf::RenderWindow & window)
 	window.draw(m_shape);
 }
 
-void Case::SetState(ECaseState eState)
+void Case::SetState(ECaseState eState, bool bForce /*= false*/)
 {
 	switch (eState)
 	{
 		case ECaseState::Empty:
 		{
-			if (m_eState != ECaseState::Start && m_eState != ECaseState::End)
-				m_shape.setFillColor(sf::Color::White);
+			if (!bForce && (m_eState == ECaseState::Start || m_eState == ECaseState::End))
+				return;
+
+			m_shape.setFillColor(sf::Color::White);
 		}
 		break;
 		case ECaseState::Wall:
 		{
-			if (m_eState != ECaseState::Start && m_eState != ECaseState::End)
-				m_shape.setFillColor(sf::Color::Black);
+			if (!bForce && (m_eState == ECaseState::Start || m_eState == ECaseState::End))
+				return;
+
+			m_shape.setFillColor(sf::Color::Black);
 		}
 		break;
 		case ECaseState::Start:

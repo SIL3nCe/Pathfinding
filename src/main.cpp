@@ -11,11 +11,22 @@ int main()
 
     while (window.isOpen())
     {
+        bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+        
         sf::Event event;
         while (window.pollEvent(event))
         {
             switch (event.type)
             {
+                case sf::Event::KeyPressed:
+                {
+                    if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed)
+                    {
+                        grid.Reset();
+                    }
+                }
+                break;
+
                 case  sf::Event::MouseButtonPressed:
                 {
                     grid.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
@@ -24,7 +35,7 @@ int main()
 
                 case sf::Event::MouseMoved:
                 {
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                    if (bMouseButtonPressed)
                     {
                         grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
                     }

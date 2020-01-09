@@ -17,7 +17,7 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 
-	void SetState(ECaseState eState);
+	void SetState(ECaseState eState, bool bForce = false);
 	ECaseState GetState(void);
 
 private:

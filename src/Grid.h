@@ -13,11 +13,15 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 	
+	void Reset(void);
+
 	void OnMouseClicked(int posX, int posY);
 	void OnMouseMoved(int posX, int posY);
 
 private:
 	Case m_aaGrid[GRID_SIZE][GRID_SIZE];
+	std::pair<int, int> m_vStart;
+	std::pair<int, int> m_vEnd;
 
 	ECaseState m_eStateToApply;
 };

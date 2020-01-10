@@ -15,6 +15,8 @@ public:
 	
 	void Reset(void);
 
+	void SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color);
+
 	void OnMouseClicked(int posX, int posY);
 	void OnMouseMoved(int posX, int posY);
 	void OnMouseReleased(void);

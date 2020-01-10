@@ -56,3 +56,8 @@ ECaseState Case::GetState(void)
 {
 	return m_eState;
 }
+
+void Case::SetColor(const sf::Color& color)
+{
+	m_shape.setFillColor(color);
+}

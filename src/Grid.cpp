@@ -52,6 +52,12 @@ void Grid::Reset(void)
 	m_aaGrid[GRID_SIZE / 2][GRID_SIZE / 2 + 5].SetState(ECaseState::End);
 }
 
+// Used to mark treated cases during alogirthms execution
+void Grid::SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color)
+{
+	m_aaGrid[vCase.first][vCase.second].SetColor(color);
+}
+
 void Grid::OnMouseClicked(int posX, int posY)
 {
 	int x = posY / CASE_SIZE;

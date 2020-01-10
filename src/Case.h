@@ -20,6 +20,8 @@ public:
 	void SetState(ECaseState eState, bool bForce = false);
 	ECaseState GetState(void);
 
+	void SetColor(const sf::Color& color);
+
 private:
 	sf::RectangleShape m_shape;
 

@@ -2,12 +2,18 @@
 
 #include "Grid.h"
 
+#include "Pathfinding.h"
+#include "Dijkstra.h"
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 800), "Pathfinding");
 
     Grid grid;
     grid.Initialize();
+
+    Dijkstra algo;
+    algo.Initialize(grid);
 
     while (window.isOpen())
     {
@@ -23,6 +29,10 @@ int main()
                     if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed)
                     {
                         grid.Reset();
+                    }
+                    else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
+                    {
+                        algo.Execute();
                     }
                 }
                 break;

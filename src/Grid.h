@@ -21,6 +21,9 @@ public:
 	void OnMouseMoved(int posX, int posY);
 	void OnMouseReleased(void);
 
+	inline bool IsValidID(int x, int y) const;
+	inline bool IsWalkable(int x, int y) const;
+
 private:
 	Case m_aaGrid[GRID_SIZE][GRID_SIZE];
 	std::pair<int, int> m_vStart;

@@ -108,3 +108,13 @@ void Grid::OnMouseReleased(void)
 {
 	m_eStateToApply = ECaseState::Empty;
 }
+
+inline bool Grid::IsValidID(int x, int y) const
+{
+	return (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE);
+}
+
+inline bool Grid::IsWalkable(int x, int y) const
+{
+	return m_aaGrid[x][y].GetState() != ECaseState::Wall && IsValidID(x, y);
+}

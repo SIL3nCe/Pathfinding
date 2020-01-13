@@ -52,7 +52,7 @@ void Case::SetState(ECaseState eState, bool bForce /*= false*/)
 	m_eState = eState;
 }
 
-ECaseState Case::GetState(void)
+ECaseState Case::GetState(void) const
 {
 	return m_eState;
 }

@@ -6,7 +6,7 @@
 class Pathfinding
 {
 public:
-	void Initialize(Grid& grid);
+	virtual void Initialize(Grid& grid);
 
 	virtual void Execute(void) = 0;
 

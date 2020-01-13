@@ -18,7 +18,7 @@ public:
 	void Draw(sf::RenderWindow & window);
 
 	void SetState(ECaseState eState, bool bForce = false);
-	ECaseState GetState(void);
+	ECaseState GetState(void) const;
 
 	void SetColor(const sf::Color& color);
 

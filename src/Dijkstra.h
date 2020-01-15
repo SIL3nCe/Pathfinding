@@ -10,14 +10,20 @@ public:
 	virtual void Execute(void) override;
 
 private:
-	struct SDatas 
+	void ComputeMinDistNodeInQueue(void);
+	void ComputeNeighboursOfCurrent(std::vector<std::pair<int, int>>& aNeighbours);
+
+private:
+	struct SDatas
 	{
-		bool bVisited;
-		float fDistance;
+		bool bVisited; // TODO move this in base grid ?
+		int distance;
 		std::pair<int, int> previous;
 	};
 
 	SDatas m_aaWorker[GRID_SIZE][GRID_SIZE];
 
-	std::vector<std::pair<int, int>> aNodeQueue;
+	std::vector<std::pair<int, int>> m_aNodeQueue;
+
+	std::pair<int, int> m_vCurrentNode;
 };

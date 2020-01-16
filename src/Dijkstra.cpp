@@ -6,7 +6,7 @@ void Dijkstra::Initialize(Grid& grid)
 
 	for (int i = 0; i < GRID_SIZE; ++i)
 	{
-		for (int j = 0; i < GRID_SIZE; ++j)
+		for (int j = 0; j < GRID_SIZE; ++j)
 		{
 			m_aaWorker[i][j].bVisited = false;
 			m_aaWorker[i][j].distance = INT_MAX;
@@ -29,14 +29,14 @@ void Dijkstra::Execute(void)
 		ComputeMinDistNodeInQueue();
 
 		// Abort if current is end of path
-		if (m_vCurrentNode == m_pGrid->GetEnd())
+		if (m_vCurrentNode == m_pGrid->GetEnd() || m_vCurrentNode.first == -1)
 			break;
 
 		// Get its neihbours
 		ComputeNeighboursOfCurrent(aNeighbours);
 
 		// Compute distance to those neighbours
-		int nNeighbours = m_aNodeQueue.size();
+		int nNeighbours = aNeighbours.size();
 		for (int i = 0; i < nNeighbours; ++i)
 		{
 			m_aaWorker[aNeighbours[i].first][aNeighbours[i].second].distance = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
@@ -45,10 +45,10 @@ void Dijkstra::Execute(void)
 		}
 
 		m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].bVisited = true;
+		m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
 	}
 
 	// Compute and draw final path from m_vCurrentNode to start
-
 
 }
 
@@ -67,8 +67,15 @@ void Dijkstra::ComputeMinDistNodeInQueue(void)
 		}
 	}
 
-	m_vCurrentNode = m_aNodeQueue[id];
-	m_aNodeQueue.erase(m_aNodeQueue.begin() + id);
+	if (id > -1)
+	{
+		m_vCurrentNode = m_aNodeQueue[id];
+		m_aNodeQueue.erase(m_aNodeQueue.begin() + id);
+	}
+	else
+	{
+		m_vCurrentNode.first = -1;
+	}
 }
 
 void Dijkstra::ComputeNeighboursOfCurrent(std::vector<std::pair<int, int>> & aNeighbours)
@@ -79,7 +86,7 @@ void Dijkstra::ComputeNeighboursOfCurrent(std::vector<std::pair<int, int>> & aNe
 
 	// Up
 	vTestNode.first -= 1;
-	if (m_pGrid->IsValidID(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
 	{
 		aNeighbours.push_back(vTestNode);
 	}
@@ -87,23 +94,23 @@ void Dijkstra::ComputeNeighboursOfCurrent(std::vector<std::pair<int, int>> & aNe
 	// Right
 	vTestNode.first += 1;
 	vTestNode.second += 1;
-	if (m_pGrid->IsValidID(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
 	{
 		aNeighbours.push_back(vTestNode);
 	}
 
 	// Down
-	vTestNode.first -= 1;
+	vTestNode.first += 1;
 	vTestNode.second -= 1;
-	if (m_pGrid->IsValidID(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
 	{
 		aNeighbours.push_back(vTestNode);
 	}
 
 	// Left
-	vTestNode.first += 1;
+	vTestNode.first -= 1;
 	vTestNode.second -= 1;
-	if (m_pGrid->IsValidID(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
 	{
 		aNeighbours.push_back(vTestNode);
 	}

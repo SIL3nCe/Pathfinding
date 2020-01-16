@@ -2,7 +2,7 @@
 
 #include "Case.h"
 
-#define GRID_SIZE 50
+#define GRID_SIZE 10
 #define CASE_SIZE 20.0f
 #define CASE_OUTLINE_SIZE 2
 
@@ -24,6 +24,7 @@ public:
 	bool IsValidID(const std::pair<int, int>& vNode) const;
 	inline bool IsValidID(int x, int y) const;
 
+	bool IsWalkable(const std::pair<int, int>& vNode) const;
 	inline bool IsWalkable(int x, int y) const;
 
 	const std::pair<int, int>& GetStart(void) const { return m_vStart; }

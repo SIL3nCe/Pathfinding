@@ -2,7 +2,7 @@
 
 void Grid::Initialize(void)
 {
-	int posX = 0, posY = 0;
+	int posX = 5, posY = 5;
 	for (int i = 0; i < GRID_SIZE; ++i)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
@@ -11,17 +11,17 @@ void Grid::Initialize(void)
 			posX += CASE_SIZE;
 		}
 
-		posX = 0.0f;
+		posX = 5;
 		posY += CASE_SIZE;
 	}
 
 	// Setup Start&End
 	m_vStart.first = GRID_SIZE / 2;
-	m_vStart.second = GRID_SIZE / 2 - 5;
+	m_vStart.second = std::max(GRID_SIZE / 2 - 5, 0);
 	m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECaseState::Start);
 
 	m_vEnd.first = GRID_SIZE / 2;
-	m_vEnd.second = GRID_SIZE / 2 + 5;
+	m_vEnd.second= std::min(GRID_SIZE / 2 + 5, GRID_SIZE - 1);
 	m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECaseState::End);
 
 	m_eStateToApply = ECaseState::Empty;
@@ -75,11 +75,11 @@ void Grid::OnMouseClicked(int posX, int posY)
 
 void Grid::OnMouseMoved(int posX, int posY)
 {
-	if (posX < 0 || posY < 0)
-		return;
-
 	int x = posY / CASE_SIZE;
 	int y = posX / CASE_SIZE;
+
+	if (!IsValidID(x, y))
+		return;
 
 	if (ECaseState::Start == m_eStateToApply)
 	{
@@ -109,14 +109,19 @@ void Grid::OnMouseReleased(void)
 	m_eStateToApply = ECaseState::Empty;
 }
 
+bool Grid::IsValidID(const std::pair<int, int>& vNode) const
+{
+	return IsValidID(vNode.first, vNode.second);
+}
+
 inline bool Grid::IsValidID(int x, int y) const
 {
 	return (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE);
 }
 
-bool Grid::IsValidID(const std::pair<int, int>& vNode) const
+bool Grid::IsWalkable(const std::pair<int, int>& vNode) const
 {
-	return IsValidID(vNode.first, vNode.second);
+	return IsWalkable(vNode.first, vNode.second);
 }
 
 inline bool Grid::IsWalkable(int x, int y) const

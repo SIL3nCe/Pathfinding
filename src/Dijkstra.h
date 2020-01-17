@@ -7,7 +7,7 @@ class Dijkstra : public Pathfinding
 public:
 	virtual void Initialize(Grid& grid) override;
 
-	virtual void Execute(void) override;
+	virtual bool Execute(void) override;
 
 private:
 	void ComputeMinDistNodeInQueue(void);

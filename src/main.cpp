@@ -15,8 +15,16 @@ int main()
     Dijkstra algo;
     algo.Initialize(grid);
 
+    bool bExecAlgo = false;
+    float fAlgoExecTime = 0.5f;
+    float fAlgoExecDt = 0.5f;
+
+    sf::Clock clock;
+
     while (window.isOpen())
     {
+        float dt = clock.restart().asSeconds() * 100.0f;
+
         bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
         
         sf::Event event;
@@ -32,7 +40,7 @@ int main()
                     }
                     else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
                     {
-                        algo.Execute();
+                        bExecAlgo = true;
                     }
                 }
                 break;
@@ -63,6 +71,18 @@ int main()
                     window.close();
                 }
                 break;
+            }
+        }
+
+        if (bExecAlgo)
+        {
+            fAlgoExecDt += dt;
+            if (fAlgoExecDt >= fAlgoExecTime)
+            {
+                printf("exec %f\n", dt);
+
+                fAlgoExecDt = 0.0f;
+                bExecAlgo = algo.Execute();
             }
         }
 

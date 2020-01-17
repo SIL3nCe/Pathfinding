@@ -19,19 +19,18 @@ void Dijkstra::Initialize(Grid& grid)
 }
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
-void Dijkstra::Execute(void)
+bool Dijkstra::Execute(void)
 {
+	// Async exec 
+
 	std::vector<std::pair<int, int>> aNeighbours;
 
-	while (true)
+	// Get min dist node in queue
+	ComputeMinDistNodeInQueue();
+
+	// Abort if current is end of path
+	if (m_vCurrentNode != m_pGrid->GetEnd() && m_vCurrentNode.first != -1)
 	{
-		// Get min dist node in queue
-		ComputeMinDistNodeInQueue();
-
-		// Abort if current is end of path
-		if (m_vCurrentNode == m_pGrid->GetEnd() || m_vCurrentNode.first == -1)
-			break;
-
 		// Get its neihbours
 		ComputeNeighboursOfCurrent(aNeighbours);
 
@@ -46,10 +45,13 @@ void Dijkstra::Execute(void)
 
 		m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].bVisited = true;
 		m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
+
+		return true;
 	}
 
 	// Compute and draw final path from m_vCurrentNode to start
 
+	return false;
 }
 
 void Dijkstra::ComputeMinDistNodeInQueue(void)

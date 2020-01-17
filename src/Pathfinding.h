@@ -9,7 +9,7 @@ class Pathfinding
 public:
 	virtual void Initialize(Grid& grid);
 
-	virtual void Execute(void) = 0;
+	virtual bool Execute(void) = 0;
 
 protected:
 	Grid * m_pGrid;

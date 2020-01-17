@@ -55,6 +55,9 @@ void Grid::Reset(void)
 // Used to mark treated cases during alogirthms execution
 void Grid::SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color)
 {
+	if (vCase == m_vStart || vCase == m_vEnd)
+		return;
+
 	m_aaGrid[vCase.first][vCase.second].SetColor(color);
 }
 
@@ -62,6 +65,9 @@ void Grid::OnMouseClicked(int posX, int posY)
 {
 	int x = posY / CASE_SIZE;
 	int y = posX / CASE_SIZE;
+	
+	if (!IsValidID(x, y))
+		return;
 
 	m_eStateToApply = m_aaGrid[x][y].GetState();
 
@@ -126,5 +132,5 @@ bool Grid::IsWalkable(const std::pair<int, int>& vNode) const
 
 inline bool Grid::IsWalkable(int x, int y) const
 {
-	return m_aaGrid[x][y].GetState() != ECaseState::Wall && IsValidID(x, y);
+	return IsValidID(x, y) && m_aaGrid[x][y].GetState() != ECaseState::Wall;
 }

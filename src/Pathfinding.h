@@ -7,9 +7,16 @@
 class Pathfinding
 {
 public:
-	virtual void Initialize(Grid& grid);
+	void Initialize(Grid& grid);
 
+	// Begin, init datas
+	virtual void Start(void) = 0;
+
+	// Async exec of algo
 	virtual bool Execute(void) = 0;
+
+	// End, compute path
+	virtual void Stop(void) = 0;
 
 protected:
 	Grid * m_pGrid;

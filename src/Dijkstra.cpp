@@ -1,57 +1,66 @@
 #include "Dijkstra.h"
 
-void Dijkstra::Initialize(Grid& grid)
-{
-	Pathfinding::Initialize(grid);
+using namespace std;
 
+// https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+
+// Init algo datas
+void Dijkstra::Start(void)
+{
 	for (int i = 0; i < GRID_SIZE; ++i)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			m_aaWorker[i][j].bVisited = false;
 			m_aaWorker[i][j].distance = INT_MAX;
+			m_aaWorker[i][j].vPrevious = {-1, -1};
+			m_aNodeQueue.push_back({i, j});
 		}
 	}
 
-	m_vCurrentNode = grid.GetStart();
-	m_aNodeQueue.push_back(m_vCurrentNode);
+	m_vCurrentNode = m_pGrid->GetStart();
 	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance = 0;
 }
 
-// https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+// Async exec
 bool Dijkstra::Execute(void)
 {
-	// Async exec 
-
-	std::vector<std::pair<int, int>> aNeighbours;
-
 	// Get min dist node in queue
 	ComputeMinDistNodeInQueue();
 
-	// Abort if current is end of path
-	if (m_vCurrentNode != m_pGrid->GetEnd() && m_vCurrentNode.first != -1)
+	if (m_vCurrentNode == m_pGrid->GetEnd() // Current is end of path
+		|| m_vCurrentNode.first == -1 // Unreachable (no more node to visit)
+		)
 	{
-		// Get its neihbours
-		ComputeNeighboursOfCurrent(aNeighbours);
-
-		// Compute distance to those neighbours
-		int nNeighbours = aNeighbours.size();
-		for (int i = 0; i < nNeighbours; ++i)
-		{
-			m_aaWorker[aNeighbours[i].first][aNeighbours[i].second].distance = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
-
-			m_aNodeQueue.push_back(aNeighbours[i]);
-		}
-
-		m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].bVisited = true;
-		m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
-
-		return true;
+		return false;
 	}
 
-	// Compute and draw final path from m_vCurrentNode to start
+	// Get its neihbours
+	ComputeNeighboursOfCurrent();
 
-	return false;
+	// Compute distance to those neighbours
+	int nNeighbours = m_aNeighbours.size();
+	for (int i = 0; i < nNeighbours; ++i)
+	{
+		// Update dist
+		m_aaWorker[m_aNeighbours[i].first][m_aNeighbours[i].second].distance = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
+		// Update prev
+		m_aaWorker[m_aNeighbours[i].first][m_aNeighbours[i].second].vPrevious = m_vCurrentNode;
+		m_pGrid->SetCaseColor(m_aNeighbours[i], sf::Color::Yellow);
+	}
+
+	m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
+
+	return true;
+}
+
+// Compute and draw final path from m_vCurrentNode to start
+void Dijkstra::Stop(void)
+{
+	while (m_vCurrentNode.first != -1)
+	{
+		m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Magenta);
+		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
+	}
 }
 
 void Dijkstra::ComputeMinDistNodeInQueue(void)
@@ -62,10 +71,11 @@ void Dijkstra::ComputeMinDistNodeInQueue(void)
 	int nNode = m_aNodeQueue.size();
 	for (int i = 0; i < nNode; ++i)
 	{
-		if (m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance < currDist)
+		float fNodeDist = m_aaWorker[m_aNodeQueue[i].first][m_aNodeQueue[i].second].distance;
+		if (fNodeDist < currDist)
 		{
 			id = i;
-			currDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance;
+			currDist = fNodeDist;
 		}
 	}
 
@@ -80,40 +90,40 @@ void Dijkstra::ComputeMinDistNodeInQueue(void)
 	}
 }
 
-void Dijkstra::ComputeNeighboursOfCurrent(std::vector<std::pair<int, int>> & aNeighbours)
+void Dijkstra::ComputeNeighboursOfCurrent(void)
 {
-	aNeighbours.clear();
+	m_aNeighbours.clear();
 
-	std::pair<int, int> vTestNode = m_vCurrentNode;
+	pair<int, int> vTestNode = m_vCurrentNode;
 
 	// Up
 	vTestNode.first -= 1;
-	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
 	{
-		aNeighbours.push_back(vTestNode);
+		m_aNeighbours.push_back(vTestNode);
 	}
 
 	// Right
 	vTestNode.first += 1;
 	vTestNode.second += 1;
-	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
 	{
-		aNeighbours.push_back(vTestNode);
+		m_aNeighbours.push_back(vTestNode);
 	}
 
 	// Down
 	vTestNode.first += 1;
 	vTestNode.second -= 1;
-	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
 	{
-		aNeighbours.push_back(vTestNode);
+		m_aNeighbours.push_back(vTestNode);
 	}
 
 	// Left
 	vTestNode.first -= 1;
 	vTestNode.second -= 1;
-	if (m_pGrid->IsWalkable(vTestNode) && !m_aaWorker[vTestNode.first][vTestNode.second].bVisited)
+	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
 	{
-		aNeighbours.push_back(vTestNode);
+		m_aNeighbours.push_back(vTestNode);
 	}
 }

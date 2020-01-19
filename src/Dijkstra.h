@@ -5,25 +5,25 @@
 class Dijkstra : public Pathfinding
 {
 public:
-	virtual void Initialize(Grid& grid) override;
-
+	virtual void Start(void) override;
 	virtual bool Execute(void) override;
+	virtual void Stop(void) override;
 
 private:
 	void ComputeMinDistNodeInQueue(void);
-	void ComputeNeighboursOfCurrent(std::vector<std::pair<int, int>>& aNeighbours);
+	void ComputeNeighboursOfCurrent(void);
 
 private:
 	struct SDatas
 	{
-		bool bVisited; // TODO move this in base grid ?
 		int distance;
-		std::pair<int, int> previous;
+		std::pair<int, int> vPrevious;
 	};
 
 	SDatas m_aaWorker[GRID_SIZE][GRID_SIZE];
 
 	std::vector<std::pair<int, int>> m_aNodeQueue;
+	std::vector<std::pair<int, int>> m_aNeighbours;
 
 	std::pair<int, int> m_vCurrentNode;
 };

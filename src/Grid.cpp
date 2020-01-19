@@ -38,6 +38,20 @@ void Grid::Draw(sf::RenderWindow & window)
 	}
 }
 
+void Grid::Clear(void)
+{
+	for (int i = 0; i < GRID_SIZE; ++i)
+	{
+		for (int j = 0; j < GRID_SIZE; ++j)
+		{
+			if (ECaseState::Empty == m_aaGrid[i][j].GetState())
+			{
+				m_aaGrid[i][j].SetColor(sf::Color::White);
+			}
+		}
+	}
+}
+
 void Grid::Reset(void)
 {
 	for (int i = 0; i < GRID_SIZE; ++i)
@@ -48,8 +62,14 @@ void Grid::Reset(void)
 		}
 	}
 
-	m_aaGrid[GRID_SIZE / 2][GRID_SIZE / 2 - 5].SetState(ECaseState::Start);
-	m_aaGrid[GRID_SIZE / 2][GRID_SIZE / 2 + 5].SetState(ECaseState::End);
+	// Setup Start&End
+	m_vStart.first = GRID_SIZE / 2;
+	m_vStart.second = std::max(GRID_SIZE / 2 - 5, 0);
+	m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECaseState::Start);
+
+	m_vEnd.first = GRID_SIZE / 2;
+	m_vEnd.second = std::min(GRID_SIZE / 2 + 5, GRID_SIZE - 1);
+	m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECaseState::End);
 }
 
 // Used to mark treated cases during alogirthms execution

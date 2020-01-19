@@ -16,14 +16,14 @@ int main()
     algo.Initialize(grid);
 
     bool bExecAlgo = false;
-    float fAlgoExecTime = 0.5f;
+    float fAlgoExecTime = 0.05f;
     float fAlgoExecDt = 0.5f;
 
     sf::Clock clock;
 
     while (window.isOpen())
     {
-        float dt = clock.restart().asSeconds() * 100.0f;
+        float dt = clock.restart().asSeconds();
 
         bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
         
@@ -34,35 +34,55 @@ int main()
             {
                 case sf::Event::KeyPressed:
                 {
-                    if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed)
+                    if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed && !bExecAlgo)
                     {
                         grid.Reset();
+                    }  
+                    else if (sf::Keyboard::C == event.key.code && !bMouseButtonPressed && !bExecAlgo)
+                    {
+                        grid.Clear();
                     }
                     else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
                     {
                         bExecAlgo = true;
+                        grid.Clear();
+                        algo.Start();
+                    }
+                    else if (sf::Keyboard::Escape == event.key.code && bExecAlgo)
+                    {
+                        bExecAlgo = false;
+                        grid.Clear();
                     }
                 }
                 break;
 
                 case  sf::Event::MouseButtonPressed:
                 {
-                    grid.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
+                    if (!bExecAlgo)
+                    {
+                        grid.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
+                    }
                 }
                 break;
 
                 case sf::Event::MouseMoved:
                 {
-                    if (bMouseButtonPressed)
+                    if (!bExecAlgo)
                     {
-                        grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
+                        if (bMouseButtonPressed)
+                        {
+                            grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
+                        }
                     }
                 }
                 break;
 
                 case sf::Event::MouseButtonReleased:
                 {
-                    grid.OnMouseReleased();
+                    if (!bExecAlgo)
+                    {
+                        grid.OnMouseReleased();
+                    }
                 }
                 break;
 
@@ -79,10 +99,11 @@ int main()
             fAlgoExecDt += dt;
             if (fAlgoExecDt >= fAlgoExecTime)
             {
-                printf("exec %f\n", dt);
-
                 fAlgoExecDt = 0.0f;
-                bExecAlgo = algo.Execute();
+                if (bExecAlgo = algo.Execute(), !bExecAlgo)
+                {
+                    algo.Stop();
+                }
             }
         }
 

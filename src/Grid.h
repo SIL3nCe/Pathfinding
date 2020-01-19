@@ -13,6 +13,7 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 	
+	void Clear(void);
 	void Reset(void);
 
 	void SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color);

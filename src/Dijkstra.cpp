@@ -4,6 +4,27 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
+void Dijkstra::Initialize(Grid& grid)
+{
+	Pathfinding::Initialize(grid);
+
+	sf::Vector2f vLocation;
+	for (int i = 0; i < GRID_SIZE; ++i)
+	{
+		for (int j = 0; j < GRID_SIZE; ++j)
+		{
+			if (m_pGrid->GetScreenCoordFromCell(i, j, vLocation))
+			{
+				m_aTexts[i * GRID_SIZE + j].setFont(m_font);
+				m_aTexts[i * GRID_SIZE + j].setString("-");
+				m_aTexts[i * GRID_SIZE + j].setColor(sf::Color::Black);
+				m_aTexts[i * GRID_SIZE + j].setPosition({ vLocation.x - CELL_SIZE * 0.25f, vLocation.y - CELL_SIZE * 0.25f });
+				m_aTexts[i * GRID_SIZE + j].setCharacterSize(CELL_SIZE * 0.5);
+			}
+		}
+	}
+}
+
 // Init algo datas
 void Dijkstra::Start(void)
 {
@@ -17,11 +38,15 @@ void Dijkstra::Start(void)
 			m_aaWorker[i][j].distance = INT_MAX;
 			m_aaWorker[i][j].vPrevious = {-1, -1};
 			m_aNodeQueue.push_back({i, j});
+
+			m_aTexts[i * GRID_SIZE + j].setString("-");
 		}
 	}
 
 	m_vCurrentNode = m_pGrid->GetStart();
 	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance = 0;
+
+	m_bDrawDebugTexts = true;
 }
 
 // Async exec
@@ -44,11 +69,21 @@ bool Dijkstra::Execute(void)
 	int nNeighbours = m_aNeighbours.size();
 	for (int i = 0; i < nNeighbours; ++i)
 	{
+		const std::pair<int, int>& vNode = m_aNeighbours[i];
+
 		// Update dist
-		m_aaWorker[m_aNeighbours[i].first][m_aNeighbours[i].second].distance = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
+		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
+		m_aaWorker[vNode.first][vNode.second].distance = newDist;
+		
 		// Update prev
-		m_aaWorker[m_aNeighbours[i].first][m_aNeighbours[i].second].vPrevious = m_vCurrentNode;
-		m_pGrid->SetCaseColor(m_aNeighbours[i], sf::Color::Yellow);
+		m_aaWorker[vNode.first][vNode.second].vPrevious = m_vCurrentNode;
+		
+		// Update text
+		char strNum[10];
+		sprintf(strNum, "%i", newDist);
+		m_aTexts[vNode.first * GRID_SIZE + vNode.second].setString(strNum);
+
+		m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
 	}
 
 	m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
@@ -61,22 +96,37 @@ void Dijkstra::Stop(void)
 {
 	while (m_vCurrentNode.first != -1)
 	{
-		m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Magenta);
+		sf::Vector2f vLocation;
+		if (m_pGrid->GetScreenCoordFromCell(m_vCurrentNode, vLocation))
+		{
+			m_aPath.push_back(sf::Vertex(vLocation, sf::Color::Magenta));
+		}
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
-		//TODO add vertex to m_aPath, get screen coord from cell coord
 	}
 }
 
 void Dijkstra::Draw(sf::RenderWindow& window)
 {
-	window.draw(m_aPath);
-	//TODO draw distances in each cases
+	if (!m_aPath.empty())
+	{
+		window.draw(&m_aPath[0], m_aPath.size(), sf::LineStrip);
+	}
+
+	if (m_bDrawDebugTexts)
+	{
+		int nTexts = GRID_SIZE * GRID_SIZE;
+		for (int i = 0; i < nTexts; ++i)
+		{
+			window.draw(m_aTexts[i]);
+		}
+	}
 }
 
 void Dijkstra::Clear(void)
 {
 	m_aPath.clear();
-	//TODO clear distances
+	m_bDrawDebugTexts = false;
+	m_aNodeQueue.clear();
 }
 
 void Dijkstra::ComputeMinDistNodeInQueue(void)

@@ -7,12 +7,12 @@ void Grid::Initialize(void)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			m_aaGrid[i][j].Initialize(CASE_SIZE, CASE_OUTLINE_SIZE, sf::Vector2f(posX, posY));
-			posX += CASE_SIZE;
+			m_aaGrid[i][j].Initialize(CELL_SIZE, CELL_OUTLINE_SIZE, sf::Vector2f(posX, posY));
+			posX += CELL_SIZE;
 		}
 
 		posX = 0;
-		posY += CASE_SIZE;
+		posY += CELL_SIZE;
 	}
 
 	// Setup Start&End
@@ -83,8 +83,8 @@ void Grid::SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color
 
 void Grid::OnMouseClicked(int posX, int posY)
 {
-	int x = posY / CASE_SIZE;
-	int y = posX / CASE_SIZE;
+	int x = posY / CELL_SIZE;
+	int y = posX / CELL_SIZE;
 
 	if (!IsValidID(x, y))
 		return;
@@ -101,8 +101,8 @@ void Grid::OnMouseClicked(int posX, int posY)
 
 void Grid::OnMouseMoved(int posX, int posY)
 {
-	int x = posY / CASE_SIZE;
-	int y = posX / CASE_SIZE;
+	int x = posY / CELL_SIZE;
+	int y = posX / CELL_SIZE;
 
 	if (!IsValidID(x, y))
 		return;
@@ -133,6 +133,22 @@ void Grid::OnMouseMoved(int posX, int posY)
 void Grid::OnMouseReleased(void)
 {
 	m_eStateToApply = ECellState::Empty;
+}
+
+bool Grid::GetScreenCoordFromCell(int x, int y, sf::Vector2f& vLocation) const
+{
+	if (IsValidID(x, y))
+	{
+		vLocation = m_aaGrid[x][y].GetScreenCoord();
+		return true;
+	}
+
+	return false;
+}
+
+bool Grid::GetScreenCoordFromCell(const std::pair<int, int>& vNode, sf::Vector2f& vLocation) const
+{
+	return GetScreenCoordFromCell(vNode.first, vNode.second, vLocation);
 }
 
 bool Grid::IsValidID(const std::pair<int, int>& vNode) const

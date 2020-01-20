@@ -17,6 +17,8 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 
+	const sf::Vector2f GetScreenCoord(void) const;
+
 	void SetState(ECellState eState, bool bForce = false);
 	ECellState GetState(void) const;
 
@@ -24,6 +26,8 @@ public:
 
 private:
 	sf::RectangleShape m_shape;
+	
+	sf::Vector2f m_aScreenCoord;
 
 	ECellState m_eState;
 };

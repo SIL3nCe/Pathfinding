@@ -5,6 +5,8 @@
 class Dijkstra : public Pathfinding
 {
 public:
+	virtual void Initialize(Grid& grid) override;
+
 	virtual void Start(void) override;
 	virtual bool Execute(void) override;
 	virtual void Stop(void) override;
@@ -31,6 +33,7 @@ private:
 	std::pair<int, int> m_vCurrentNode;
 
 	//Debug info
-	sf::VertexArray m_aPath;
-	// TODO text for distances in every node
+	std::vector<sf::Vertex> m_aPath;
+	sf::Text m_aTexts[GRID_SIZE * GRID_SIZE];
+	bool m_bDrawDebugTexts = false;
 };

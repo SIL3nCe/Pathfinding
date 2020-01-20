@@ -2,9 +2,9 @@
 
 #include "Cell.h"
 
-#define GRID_SIZE 10
-#define CASE_SIZE 20.0f
-#define CASE_OUTLINE_SIZE 2
+#define GRID_SIZE 30
+#define CELL_SIZE 20.0f
+#define CELL_OUTLINE_SIZE 2
 
 class Grid
 {
@@ -21,6 +21,9 @@ public:
 	void OnMouseClicked(int posX, int posY);
 	void OnMouseMoved(int posX, int posY);
 	void OnMouseReleased(void);
+
+	bool GetScreenCoordFromCell(int x, int y, sf::Vector2f& vLocation) const;
+	bool GetScreenCoordFromCell(const std::pair<int, int>& vNode, sf::Vector2f& vLocation) const;
 
 	bool IsValidID(const std::pair<int, int>& vNode) const;
 	inline bool IsValidID(int x, int y) const;

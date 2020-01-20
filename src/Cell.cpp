@@ -9,12 +9,19 @@ void Cell::Initialize(float fSize, float fOutlineThickness, const sf::Vector2f& 
 	m_shape.setOutlineThickness(fOutlineThickness);
 	m_shape.setOutlineColor(sf::Color::Black);
 
+	m_aScreenCoord = { vLocation.x + fSize*0.5f, vLocation.y + fSize*0.5f };
+
 	m_eState = ECellState::Empty;
 }
 
 void Cell::Draw(sf::RenderWindow & window)
 {
 	window.draw(m_shape);
+}
+
+const sf::Vector2f Cell::GetScreenCoord(void) const
+{
+	return m_aScreenCoord;
 }
 
 void Cell::SetState(ECellState eState, bool bForce /*= false*/)

@@ -16,7 +16,7 @@ int main()
     algo.Initialize(grid);
 
     bool bExecAlgo = false;
-    float fAlgoExecTime = 0.05f;
+    float fAlgoExecTime = 0.01f;
     float fAlgoExecDt = 0.5f;
 
     sf::Clock clock;

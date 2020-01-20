@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Case.h"
+#include "Cell.h"
 
 #define GRID_SIZE 10
 #define CASE_SIZE 20.0f
@@ -32,10 +32,9 @@ public:
 	const std::pair<int, int>& GetEnd(void) const { return m_vEnd; }
 
 private:
-	Case m_aaGrid[GRID_SIZE][GRID_SIZE];
+	Cell m_aaGrid[GRID_SIZE][GRID_SIZE];
 	std::pair<int, int> m_vStart;
 	std::pair<int, int> m_vEnd;
 
-	ECaseState m_eStateToApply;
+	ECellState m_eStateToApply;
 };
-

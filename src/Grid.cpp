@@ -2,7 +2,7 @@
 
 void Grid::Initialize(void)
 {
-	int posX = 5, posY = 5;
+	int posX = 0, posY = 0;
 	for (int i = 0; i < GRID_SIZE; ++i)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
@@ -11,20 +11,20 @@ void Grid::Initialize(void)
 			posX += CASE_SIZE;
 		}
 
-		posX = 5;
+		posX = 0;
 		posY += CASE_SIZE;
 	}
 
 	// Setup Start&End
 	m_vStart.first = GRID_SIZE / 2;
 	m_vStart.second = std::max(GRID_SIZE / 2 - 5, 0);
-	m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECaseState::Start);
+	m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECellState::Start);
 
 	m_vEnd.first = GRID_SIZE / 2;
 	m_vEnd.second= std::min(GRID_SIZE / 2 + 5, GRID_SIZE - 1);
-	m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECaseState::End);
+	m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECellState::End);
 
-	m_eStateToApply = ECaseState::Empty;
+	m_eStateToApply = ECellState::Empty;
 }
 
 void Grid::Draw(sf::RenderWindow & window)
@@ -44,7 +44,7 @@ void Grid::Clear(void)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			if (ECaseState::Empty == m_aaGrid[i][j].GetState())
+			if (ECellState::Empty == m_aaGrid[i][j].GetState())
 			{
 				m_aaGrid[i][j].SetColor(sf::Color::White);
 			}
@@ -58,18 +58,18 @@ void Grid::Reset(void)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			m_aaGrid[i][j].SetState(ECaseState::Empty, true);
+			m_aaGrid[i][j].SetState(ECellState::Empty, true);
 		}
 	}
 
 	// Setup Start&End
 	m_vStart.first = GRID_SIZE / 2;
 	m_vStart.second = std::max(GRID_SIZE / 2 - 5, 0);
-	m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECaseState::Start);
+	m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECellState::Start);
 
 	m_vEnd.first = GRID_SIZE / 2;
 	m_vEnd.second = std::min(GRID_SIZE / 2 + 5, GRID_SIZE - 1);
-	m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECaseState::End);
+	m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECellState::End);
 }
 
 // Used to mark treated cases during alogirthms execution
@@ -85,16 +85,16 @@ void Grid::OnMouseClicked(int posX, int posY)
 {
 	int x = posY / CASE_SIZE;
 	int y = posX / CASE_SIZE;
-	
+
 	if (!IsValidID(x, y))
 		return;
 
 	m_eStateToApply = m_aaGrid[x][y].GetState();
 
-	if (ECaseState::Wall == m_eStateToApply)
-		m_eStateToApply = ECaseState::Empty;
-	else if (ECaseState::Empty == m_eStateToApply)
-		m_eStateToApply = ECaseState::Wall;
+	if (ECellState::Wall == m_eStateToApply)
+		m_eStateToApply = ECellState::Empty;
+	else if (ECellState::Empty == m_eStateToApply)
+		m_eStateToApply = ECellState::Wall;
 
 	m_aaGrid[x][y].SetState(m_eStateToApply);
 }
@@ -107,22 +107,22 @@ void Grid::OnMouseMoved(int posX, int posY)
 	if (!IsValidID(x, y))
 		return;
 
-	if (ECaseState::Start == m_eStateToApply)
+	if (ECellState::Start == m_eStateToApply)
 	{
-		if (ECaseState::End == m_aaGrid[x][y].GetState())
+		if (ECellState::End == m_aaGrid[x][y].GetState())
 			return;
 
-		m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECaseState::Empty, true);
+		m_aaGrid[m_vStart.first][m_vStart.second].SetState(ECellState::Empty, true);
 		m_vStart.first = x;
 		m_vStart.second = y;
 	}
 		
-	if (ECaseState::End == m_eStateToApply)
+	if (ECellState::End == m_eStateToApply)
 	{
-		if (ECaseState::Start == m_aaGrid[x][y].GetState())
+		if (ECellState::Start == m_aaGrid[x][y].GetState())
 			return;
 
-		m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECaseState::Empty, true);
+		m_aaGrid[m_vEnd.first][m_vEnd.second].SetState(ECellState::Empty, true);
 		m_vEnd.first = x;
 		m_vEnd.second = y;
 	}
@@ -132,7 +132,7 @@ void Grid::OnMouseMoved(int posX, int posY)
 
 void Grid::OnMouseReleased(void)
 {
-	m_eStateToApply = ECaseState::Empty;
+	m_eStateToApply = ECellState::Empty;
 }
 
 bool Grid::IsValidID(const std::pair<int, int>& vNode) const
@@ -152,5 +152,5 @@ bool Grid::IsWalkable(const std::pair<int, int>& vNode) const
 
 inline bool Grid::IsWalkable(int x, int y) const
 {
-	return IsValidID(x, y) && m_aaGrid[x][y].GetState() != ECaseState::Wall;
+	return IsValidID(x, y) && m_aaGrid[x][y].GetState() != ECellState::Wall;
 }

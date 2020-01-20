@@ -9,6 +9,9 @@ public:
 	virtual bool Execute(void) override;
 	virtual void Stop(void) override;
 
+	virtual void Draw(sf::RenderWindow& window) override;
+	virtual void Clear(void) override;
+
 private:
 	void ComputeMinDistNodeInQueue(void);
 	void ComputeNeighboursOfCurrent(void);
@@ -26,4 +29,8 @@ private:
 	std::vector<std::pair<int, int>> m_aNeighbours;
 
 	std::pair<int, int> m_vCurrentNode;
+
+	//Debug info
+	sf::VertexArray m_aPath;
+	// TODO text for distances in every node
 };

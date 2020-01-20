@@ -18,6 +18,11 @@ public:
 	// End, compute path
 	virtual void Stop(void) = 0;
 
+	// Draw additional debug info from algo
+	virtual void Draw(sf::RenderWindow& window) = 0;
+	// Clear debug infos
+	virtual void Clear(void) = 0;
+
 protected:
 	Grid * m_pGrid;
 };

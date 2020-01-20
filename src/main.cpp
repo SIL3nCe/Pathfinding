@@ -37,21 +37,29 @@ int main()
                     if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed && !bExecAlgo)
                     {
                         grid.Reset();
+                        algo.Clear();
                     }  
                     else if (sf::Keyboard::C == event.key.code && !bMouseButtonPressed && !bExecAlgo)
                     {
                         grid.Clear();
+                        algo.Clear();
                     }
                     else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
                     {
-                        bExecAlgo = true;
-                        grid.Clear();
-                        algo.Start();
+                        //TODO pause when hitting space again, add bool to know if need to clear
+                        if (!bExecAlgo)
+                        {
+                            bExecAlgo = true;
+                            grid.Clear();
+                            algo.Clear();
+                            algo.Start();
+                        }
                     }
                     else if (sf::Keyboard::Escape == event.key.code && bExecAlgo)
                     {
                         bExecAlgo = false;
                         grid.Clear();
+                        algo.Clear();
                     }
                 }
                 break;
@@ -110,6 +118,7 @@ int main()
         window.clear();
 
         grid.Draw(window);
+        algo.Draw(window);
 
         window.display();
     }

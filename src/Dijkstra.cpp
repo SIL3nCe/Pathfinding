@@ -7,6 +7,9 @@ using namespace std;
 // Init algo datas
 void Dijkstra::Start(void)
 {
+	m_aNodeQueue.clear();
+	m_aNeighbours.clear();
+
 	for (int i = 0; i < GRID_SIZE; ++i)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
@@ -60,7 +63,20 @@ void Dijkstra::Stop(void)
 	{
 		m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Magenta);
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
+		//TODO add vertex to m_aPath, get screen coord from cell coord
 	}
+}
+
+void Dijkstra::Draw(sf::RenderWindow& window)
+{
+	window.draw(m_aPath);
+	//TODO draw distances in each cases
+}
+
+void Dijkstra::Clear(void)
+{
+	m_aPath.clear();
+	//TODO clear distances
 }
 
 void Dijkstra::ComputeMinDistNodeInQueue(void)

@@ -9,11 +9,17 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 800), "Pathfinding");
 
+    sf::Font font;
+    if (!font.loadFromFile("Resources\\Gold-Regular.ttf"))
+    {
+        printf("Pathfinding::Initialize Cannot load font");
+    }
+
     Grid grid;
     grid.Initialize();
 
     Dijkstra algo;
-    algo.Initialize(grid);
+    algo.Initialize(grid, font);
 
     bool bExecAlgo = false;
     float fAlgoExecTime = 0.01f;

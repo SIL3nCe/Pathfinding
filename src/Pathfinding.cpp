@@ -1,13 +1,9 @@
 #include "Pathfinding.h"
 
-void Pathfinding::Initialize(Grid& grid)
+void Pathfinding::Initialize(Grid& grid, sf::Font& font)
 {
 	m_pGrid = &grid;
-
-	if (!m_font.loadFromFile("Resources\\Gold-Regular.ttf"))
-	{
-		printf("Pathfinding::Initialize Cannot load font");
-	}
+	m_pFont = &font;
 }
 
 void Pathfinding::Draw(sf::RenderWindow& window)

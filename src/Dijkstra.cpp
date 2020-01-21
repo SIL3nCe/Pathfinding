@@ -4,9 +4,9 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
-void Dijkstra::Initialize(Grid& grid)
+void Dijkstra::Initialize(Grid& grid, sf::Font& font)
 {
-	Pathfinding::Initialize(grid);
+	Pathfinding::Initialize(grid, font);
 
 	sf::Vector2f vLocation;
 	for (int i = 0; i < GRID_SIZE; ++i)
@@ -15,7 +15,7 @@ void Dijkstra::Initialize(Grid& grid)
 		{
 			if (m_pGrid->GetScreenCoordFromCell(i, j, vLocation))
 			{
-				m_aTexts[i * GRID_SIZE + j].setFont(m_font);
+				m_aTexts[i * GRID_SIZE + j].setFont(*m_pFont);
 				m_aTexts[i * GRID_SIZE + j].setString("-");
 				m_aTexts[i * GRID_SIZE + j].setColor(sf::Color::Black);
 				m_aTexts[i * GRID_SIZE + j].setPosition({ vLocation.x - CELL_SIZE * 0.25f, vLocation.y - CELL_SIZE * 0.25f });

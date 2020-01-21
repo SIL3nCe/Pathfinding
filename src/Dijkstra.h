@@ -5,7 +5,7 @@
 class Dijkstra : public Pathfinding
 {
 public:
-	virtual void Initialize(Grid& grid) override;
+	virtual void Initialize(Grid& grid, sf::Font& font) override;
 
 	virtual void Start(void) override;
 	virtual bool Execute(void) override;

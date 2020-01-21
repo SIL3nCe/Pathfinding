@@ -7,7 +7,7 @@
 class Pathfinding
 {
 public:
-	virtual void Initialize(Grid& grid);
+	virtual void Initialize(Grid& grid, sf::Font& font);
 
 	// Begin, init datas
 	virtual void Start(void) = 0;
@@ -26,5 +26,5 @@ public:
 protected:
 	Grid * m_pGrid;
 
-	sf::Font m_font;
+	sf::Font * m_pFont;
 };

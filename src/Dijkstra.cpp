@@ -69,7 +69,7 @@ bool Dijkstra::Execute(void)
 	int nNeighbours = m_aNeighbours.size();
 	for (int i = 0; i < nNeighbours; ++i)
 	{
-		const std::pair<int, int>& vNode = m_aNeighbours[i];
+		const pair<int, int>& vNode = m_aNeighbours[i];
 
 		// Update dist
 		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;

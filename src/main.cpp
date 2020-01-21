@@ -4,6 +4,7 @@
 
 #include "Pathfinding.h"
 #include "Dijkstra.h"
+#include "BreadthFirst.h"
 
 int main()
 {
@@ -18,7 +19,8 @@ int main()
     Grid grid;
     grid.Initialize();
 
-    Dijkstra algo;
+    //Dijkstra algo;
+    BreadthFirst algo;
     algo.Initialize(grid, font);
 
     bool bExecAlgo = false;

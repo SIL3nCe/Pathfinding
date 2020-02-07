@@ -5,6 +5,7 @@
 #include "Pathfinding.h"
 #include "Dijkstra.h"
 #include "BreadthFirst.h"
+#include "AStar.h"
 
 int main()
 {
@@ -20,7 +21,9 @@ int main()
     grid.Initialize();
 
     //Dijkstra algo;
-    BreadthFirst algo;
+    //Dijkstra algo;
+    //BreadthFirst algo;
+    AStar algo;
     algo.Initialize(grid, font);
 
     bool bExecAlgo = false;

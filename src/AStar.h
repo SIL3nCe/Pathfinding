@@ -23,7 +23,7 @@ private:
 private:
 	struct SDatas
 	{
-		bool bDiscovered;
+		bool bClosed;
 		int heuristique;
 		int cost;
 		std::pair<int, int> vPrevious;

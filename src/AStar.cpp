@@ -33,8 +33,8 @@ void AStar::Start(void)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			m_aaWorker[i][j].bDiscovered = false;
-			m_aaWorker[i][j].cost = -1;
+			m_aaWorker[i][j].bClosed = false;
+			m_aaWorker[i][j].cost = INT_MAX;
 			pair<int, int> vNode(i, j);
 			m_aaWorker[i][j].heuristique = Utility::GetManhattanDistance(vNode, m_pGrid->GetEnd());
 
@@ -48,7 +48,7 @@ void AStar::Start(void)
 
 	const pair<int, int>& vStart = m_pGrid->GetStart();
 	m_aNodeQueue.push_back(vStart);
-	m_aaWorker[vStart.first][vStart.second].bDiscovered = true;
+	m_aaWorker[vStart.first][vStart.second].bClosed = true;
 	m_aaWorker[vStart.first][vStart.second].cost = 0;
 	
 	m_bDrawDebugTexts = true;
@@ -74,8 +74,23 @@ bool AStar::Execute(void)
 	{
 		const pair<int, int>& vNode = m_aNeighbours[i];
 
-		//TODO
+		int newCost = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].cost + 1;
+
+		SDatas * pData = &m_aaWorker[vNode.first][vNode.second];
+
+		if (!pData->bClosed && newCost < pData->cost)
+		{
+			pData->vPrevious = m_vCurrentNode;
+			pData->cost = newCost;
+			pData->heuristique = pData->cost + Utility::GetManhattanDistance(vNode, m_pGrid->GetEnd());
+			
+			m_aNodeQueue.push_back(vNode);
+			m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
+		}
 	}
+
+	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].bClosed = true;
+	m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
 
 	return true;
 }
@@ -152,7 +167,7 @@ void AStar::ComputeNeighboursOfCurrent(void)
 
 	// Up
 	vTestNode.first -= 1;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}
@@ -160,7 +175,7 @@ void AStar::ComputeNeighboursOfCurrent(void)
 	// Right
 	vTestNode.first += 1;
 	vTestNode.second += 1;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}
@@ -168,7 +183,7 @@ void AStar::ComputeNeighboursOfCurrent(void)
 	// Down
 	vTestNode.first += 1;
 	vTestNode.second -= 1;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}
@@ -176,7 +191,7 @@ void AStar::ComputeNeighboursOfCurrent(void)
 	// Left
 	vTestNode.first -= 1;
 	vTestNode.second -= 1;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}

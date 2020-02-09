@@ -10,4 +10,11 @@ file(GLOB_RECURSE SRC_FILES *.cpp *.h *.inl)
 
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 add_executable(Pathfinding ${SRC_FILES})
+
+# ImGUI
+set(IMGUI_DIR "C:/DevProjects/imgui-master")
+target_include_directories(Pathfinding PRIVATE ${IMGUI_DIR})
+
+# SFML
 target_link_libraries(Pathfinding sfml-graphics)
+

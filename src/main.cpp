@@ -1,11 +1,13 @@
 #include <SFML/Graphics.hpp>
 
+#include "imgui.h"
+
 #include "Grid.h"
 
-#include "Pathfinding.h"
-#include "Dijkstra.h"
-#include "BreadthFirst.h"
-#include "AStar.h"
+#include "Algo/Pathfinding.h"
+#include "Algo/Dijkstra.h"
+#include "Algo/BreadthFirst.h"
+#include "Algo/AStar.h"
 
 int main()
 {

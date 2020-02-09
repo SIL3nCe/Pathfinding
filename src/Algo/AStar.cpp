@@ -35,8 +35,7 @@ void AStar::Start(void)
 		{
 			m_aaWorker[i][j].bClosed = false;
 			m_aaWorker[i][j].cost = INT_MAX;
-			pair<int, int> vNode(i, j);
-			m_aaWorker[i][j].heuristique = Utility::GetManhattanDistance(vNode, m_pGrid->GetEnd());
+			m_aaWorker[i][j].heuristique = Utility::GetManhattanDistance({i, j}, m_pGrid->GetEnd());
 
 			char strNum[10];
 			sprintf(strNum, "%i", m_aaWorker[i][j].heuristique);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Grid.h"
-#include "Utility.h"
+#include "../Grid.h"
+#include "../Utility.h"
 
 // Base class to inherit in algorithm classes
 class Pathfinding

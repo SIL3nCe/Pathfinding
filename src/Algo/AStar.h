@@ -16,7 +16,6 @@ public:
 	virtual void Clear(void) override;
 
 private:
-	//TODO Move them in Pathfinding
 	void ComputeMinHeuristiqueNodeInQueue(void);
 	void ComputeNeighboursOfCurrent(void);
 

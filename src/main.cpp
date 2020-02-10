@@ -1,6 +1,7 @@
-#include <SFML/Graphics.hpp>
-
 #include "imgui.h"
+#include "imgui-SFML.h"
+
+#include <SFML/Graphics.hpp>
 
 #include "Grid.h"
 
@@ -12,6 +13,8 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 800), "Pathfinding");
+    window.setFramerateLimit(60);
+    ImGui::SFML::Init(window);
 
     sf::Font font;
     if (!font.loadFromFile("Resources\\Gold-Regular.ttf"))
@@ -36,13 +39,15 @@ int main()
 
     while (window.isOpen())
     {
-        float dt = clock.restart().asSeconds();
+        sf::Time dtTime = clock.restart();
+        float dt = dtTime.asSeconds();
 
         bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
         
         sf::Event event;
         while (window.pollEvent(event))
         {
+            ImGui::SFML::ProcessEvent(event);
             switch (event.type)
             {
                 case sf::Event::KeyPressed:
@@ -127,14 +132,26 @@ int main()
                 }
             }
         }
+        
+        ImGui::SFML::Update(window, dtTime);
+
+        //ImGui::ShowDemoWindow();
+
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
+        ImGui::End();
 
         window.clear();
 
         grid.Draw(window);
         algo.Draw(window);
 
+        ImGui::SFML::Render(window);
+
         window.display();
     }
+
+    ImGui::SFML::Shutdown();
 
     return 0;
 }

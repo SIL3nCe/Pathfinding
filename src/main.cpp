@@ -1,8 +1,6 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#include <SFML/Graphics.hpp>
-
 #include "Grid.h"
 
 #include "Algo/Pathfinding.h"

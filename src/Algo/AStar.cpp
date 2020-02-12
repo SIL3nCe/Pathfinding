@@ -107,6 +107,14 @@ void AStar::Stop(void)
 	}
 }
 
+void AStar::DrawGui(void)
+{
+	if (ImGui::CollapsingHeader("A*"))
+	{
+		ImGui::Button("launch algo");
+	}
+}
+
 void AStar::Draw(sf::RenderWindow& window)
 {
 	if (!m_aPath.empty())

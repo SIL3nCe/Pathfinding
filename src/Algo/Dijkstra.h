@@ -10,7 +10,9 @@ public:
 	virtual void Start(void) override;
 	virtual bool Execute(void) override;
 	virtual void Stop(void) override;
-
+	
+	virtual void DrawGui(void) override;
+	
 	virtual void Draw(sf::RenderWindow& window) override;
 	virtual void Clear(void) override;
 

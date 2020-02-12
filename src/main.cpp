@@ -12,24 +12,39 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 800), "Pathfinding");
     window.setFramerateLimit(60);
+
     ImGui::SFML::Init(window);
 
     sf::Font font;
     if (!font.loadFromFile("Resources\\Gold-Regular.ttf"))
     {
-        printf("Pathfinding::Initialize Cannot load font");
+        printf("Cannot load font");
     }
 
+    // Init grid
     Grid grid;
     grid.Initialize();
 
-    //Dijkstra algo;
-    //Dijkstra algo;
-    //BreadthFirst algo;
-    AStar algo;
-    algo.Initialize(grid, font);
+    // Init algos
+    Dijkstra algo_Dijkstra;
+    BreadthFirst algo_BreadthFirst;
+    AStar algo_AStart;
+
+    std::vector<Pathfinding*> aAlgo;
+    aAlgo.push_back(&algo_AStart);
+    aAlgo.push_back(&algo_Dijkstra);
+    aAlgo.push_back(&algo_BreadthFirst);
+
+    for (Pathfinding* pAlgo : aAlgo)
+    {
+        pAlgo->Initialize(grid, font);
+    }
+
+    Pathfinding* pCurrentAlgo = aAlgo[0];
 
     bool bExecAlgo = false;
+
+    // Time datas
     float fAlgoExecTime = 0.01f;
     float fAlgoExecDt = 0.5f;
 
@@ -53,12 +68,12 @@ int main()
                     if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed && !bExecAlgo)
                     {
                         grid.Reset();
-                        algo.Clear();
+                        pCurrentAlgo->Clear();
                     }  
                     else if (sf::Keyboard::C == event.key.code && !bMouseButtonPressed && !bExecAlgo)
                     {
                         grid.Clear();
-                        algo.Clear();
+                        pCurrentAlgo->Clear();
                     }
                     else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
                     {
@@ -67,15 +82,15 @@ int main()
                         {
                             bExecAlgo = true;
                             grid.Clear();
-                            algo.Clear();
-                            algo.Start();
+                            pCurrentAlgo->Clear();
+                            pCurrentAlgo->Start();
                         }
                     }
                     else if (sf::Keyboard::Escape == event.key.code && bExecAlgo)
                     {
                         bExecAlgo = false;
                         grid.Clear();
-                        algo.Clear();
+                        pCurrentAlgo->Clear();
                     }
                 }
                 break;
@@ -124,25 +139,34 @@ int main()
             if (fAlgoExecDt >= fAlgoExecTime)
             {
                 fAlgoExecDt = 0.0f;
-                if (bExecAlgo = algo.Execute(), !bExecAlgo)
+                if (bExecAlgo = pCurrentAlgo->Execute(), !bExecAlgo)
                 {
-                    algo.Stop();
+                    pCurrentAlgo->Stop();
                 }
             }
         }
         
         ImGui::SFML::Update(window, dtTime);
 
-        //ImGui::ShowDemoWindow();
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
+        ImGui::Begin("Stats");
+        ImGui::LabelText("...", "Length: ");
+        ImGui::LabelText("...", "Time: ");
+        ImGui::LabelText("...", "Steps: ");
         ImGui::End();
+
+        if (ImGui::Begin("Algorithmes"))
+        {
+            for (Pathfinding* pAlgo : aAlgo)
+            {
+                pAlgo->DrawGui();
+            }
+            ImGui::End();
+        }
 
         window.clear();
 
         grid.Draw(window);
-        algo.Draw(window);
+        pCurrentAlgo->Draw(window);
 
         ImGui::SFML::Render(window);
 

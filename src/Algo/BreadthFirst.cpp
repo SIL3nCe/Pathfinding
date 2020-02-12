@@ -80,6 +80,14 @@ void BreadthFirst::Stop(void)
 	}
 }
 
+void BreadthFirst::DrawGui(void)
+{
+	if (ImGui::CollapsingHeader("Breadth First"))
+	{
+		ImGui::Button("launch algo");
+	}
+}
+
 void BreadthFirst::Draw(sf::RenderWindow& window)
 {
 	if (!m_aPath.empty())

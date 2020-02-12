@@ -2,6 +2,7 @@
 
 #include "../Grid.h"
 #include "../Utility.h"
+#include "imgui.h"
 
 // Base class to inherit in algorithm classes
 class Pathfinding
@@ -17,6 +18,9 @@ public:
 
 	// End, compute path
 	virtual void Stop(void) = 0;
+
+	// Draw GUI
+	virtual void DrawGui(void) = 0;
 
 	// Draw additional debug info from algo
 	virtual void Draw(sf::RenderWindow& window) = 0;

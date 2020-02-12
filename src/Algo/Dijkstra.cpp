@@ -105,6 +105,14 @@ void Dijkstra::Stop(void)
 	}
 }
 
+void Dijkstra::DrawGui(void)
+{
+	if (ImGui::CollapsingHeader("Dijkstra"))
+	{
+		ImGui::Button("launch algo");
+	}
+}
+
 void Dijkstra::Draw(sf::RenderWindow& window)
 {
 	if (!m_aPath.empty())

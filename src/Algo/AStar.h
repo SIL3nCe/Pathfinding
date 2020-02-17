@@ -18,8 +18,9 @@ public:
 	virtual void Clear(void) override;
 
 private:
-	void ComputeMinHeuristiqueNodeInQueue(void);
+	void ComputeMinHeuristicNodeInQueue(void);
 	void ComputeNeighboursOfCurrent(void);
+	float ComputeHeuristic(const std::pair<int, int>& start, const std::pair<int, int>& end);
 
 private:
 	struct SDatas
@@ -38,7 +39,15 @@ private:
 	std::pair<int, int> m_vCurrentNode;
 	
 	// Options
-	//TODO Enum heuristiques. Avec Null pour simuler un Dijkstra
+	enum class EHeuristics : unsigned int
+	{
+		Manhattan,
+		Euclidean,
+		Chebyshev,
+		Null
+	};
+	EHeuristics m_eHeuristic;
+
 	bool m_bUseDiagonal;
 	bool m_bBidirectional;
 

@@ -148,11 +148,13 @@ int main()
         
         ImGui::SFML::Update(window, dtTime);
 
-        ImGui::Begin("Stats");
-        ImGui::LabelText("...", "Length: ");
-        ImGui::LabelText("...", "Time: ");
-        ImGui::LabelText("...", "Steps: ");
-        ImGui::End();
+        if (ImGui::Begin("Stats"))
+        {
+            ImGui::LabelText("...", "Length: ");
+            ImGui::LabelText("...", "Time: ");
+            ImGui::LabelText("...", "Steps: ");
+            ImGui::End();
+        }
 
         if (ImGui::Begin("Algorithmes"))
         {

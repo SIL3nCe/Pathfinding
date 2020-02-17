@@ -24,6 +24,7 @@ void AStar::Initialize(Grid& grid, sf::Font& font)
 		}
 	}
 
+	m_eHeuristic = EHeuristics::Manhattan;
 	m_bUseDiagonal = false;
 	m_bBidirectional = false;
 	m_bDrawDebugTexts = true;
@@ -39,7 +40,7 @@ void AStar::Start(void)
 		{
 			m_aaWorker[i][j].bClosed = false;
 			m_aaWorker[i][j].cost = INT_MAX;
-			m_aaWorker[i][j].heuristique = Utility::GetManhattanDistance({i, j}, m_pGrid->GetEnd());
+			m_aaWorker[i][j].heuristique = ComputeHeuristic({i, j}, m_pGrid->GetEnd());
 
 			char strNum[10];
 			sprintf(strNum, "%i", m_aaWorker[i][j].heuristique);
@@ -57,7 +58,7 @@ void AStar::Start(void)
 
 bool AStar::Execute(void)
 {
-	ComputeMinHeuristiqueNodeInQueue();
+	ComputeMinHeuristicNodeInQueue();
 	
 	if (m_vCurrentNode == m_pGrid->GetEnd() // Current is end of path
 		|| m_vCurrentNode.first == -1 // Unreachable (no more node to visit)
@@ -83,7 +84,7 @@ bool AStar::Execute(void)
 		{
 			pData->vPrevious = m_vCurrentNode;
 			pData->cost = newCost;
-			pData->heuristique = pData->cost + Utility::GetManhattanDistance(vNode, m_pGrid->GetEnd());
+			pData->heuristique = pData->cost + ComputeHeuristic(vNode, m_pGrid->GetEnd());
 			
 			m_aNodeQueue.push_back(vNode);
 			m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
@@ -113,9 +114,16 @@ void AStar::DrawGui(void)
 {
 	if (ImGui::CollapsingHeader("A*"))
 	{
+		if (ImGui::RadioButton("Manhattan", m_eHeuristic == EHeuristics::Manhattan)) { m_eHeuristic = EHeuristics::Manhattan; }
+		if (ImGui::RadioButton("Euclidean", m_eHeuristic == EHeuristics::Euclidean)) { m_eHeuristic = EHeuristics::Euclidean; }
+		if (ImGui::RadioButton("Chebyshev", m_eHeuristic == EHeuristics::Chebyshev)) { m_eHeuristic = EHeuristics::Chebyshev; }
+		if (ImGui::RadioButton("Null (Dijkstra)", m_eHeuristic == EHeuristics::Null)) { m_eHeuristic = EHeuristics::Null; }
+	
+		ImGui::Separator();
+	
 		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
 		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
-
+	
 		ImGui::Checkbox("Heuristique value text", &m_bDrawDebugTexts);
 	}
 }
@@ -144,7 +152,7 @@ void AStar::Clear(void)
 	m_aNodeQueue.clear();
 }
 
-void AStar::ComputeMinHeuristiqueNodeInQueue(void)
+void AStar::ComputeMinHeuristicNodeInQueue(void)
 {
 	int currDist = INT_MAX;
 	int id = -1;
@@ -238,4 +246,17 @@ void AStar::ComputeNeighboursOfCurrent(void)
 			m_aNeighbours.push_back(vTestNode);
 		}
 	}
+}
+
+float AStar::ComputeHeuristic(const std::pair<int, int>& start, const std::pair<int, int>& end)
+{
+	switch (m_eHeuristic)
+	{
+		case EHeuristics::Manhattan: { return Utility::GetManhattanDistance(start, end); };
+		case EHeuristics::Euclidean: { return Utility::GetEuclideanDistance(start, end); };
+		case EHeuristics::Chebyshev: {return Utility::GetChebyshevDistance(start, end); };
+		case EHeuristics::Null: { return 0; };
+	}
+
+	return 0;
 }

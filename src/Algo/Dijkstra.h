@@ -34,8 +34,13 @@ private:
 
 	std::pair<int, int> m_vCurrentNode;
 
+	//Options
+	bool m_bUseDiagonal;
+	bool m_bBidirectional;
+
+	bool m_bDrawDebugTexts;
+
 	//Debug info
 	std::vector<sf::Vertex> m_aPath;
 	sf::Text m_aTexts[GRID_SIZE * GRID_SIZE];
-	bool m_bDrawDebugTexts = false;
 };

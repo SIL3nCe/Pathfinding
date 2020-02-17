@@ -23,6 +23,10 @@ void AStar::Initialize(Grid& grid, sf::Font& font)
 			}
 		}
 	}
+
+	m_bUseDiagonal = false;
+	m_bBidirectional = false;
+	m_bDrawDebugTexts = true;
 }
 
 void AStar::Start(void)
@@ -49,8 +53,6 @@ void AStar::Start(void)
 	m_aNodeQueue.push_back(vStart);
 	m_aaWorker[vStart.first][vStart.second].bClosed = true;
 	m_aaWorker[vStart.first][vStart.second].cost = 0;
-	
-	m_bDrawDebugTexts = true;
 }
 
 bool AStar::Execute(void)
@@ -111,7 +113,10 @@ void AStar::DrawGui(void)
 {
 	if (ImGui::CollapsingHeader("A*"))
 	{
-		ImGui::Button("launch algo");
+		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
+		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
+
+		ImGui::Checkbox("Heuristique value text", &m_bDrawDebugTexts);
 	}
 }
 
@@ -201,5 +206,36 @@ void AStar::ComputeNeighboursOfCurrent(void)
 	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
+	}
+
+	if (m_bUseDiagonal)
+	{
+		// Top Left
+		vTestNode.first -= 1;
+		if (m_pGrid->IsWalkable(vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Top Right
+		vTestNode.second += 2;
+		if (m_pGrid->IsWalkable(vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Bottom Right
+		vTestNode.first += 2;
+		if (m_pGrid->IsWalkable(vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Bottom Left
+		vTestNode.second -= 2;
+		if (m_pGrid->IsWalkable(vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
 	}
 }

@@ -23,6 +23,10 @@ void Dijkstra::Initialize(Grid& grid, sf::Font& font)
 			}
 		}
 	}
+
+	m_bUseDiagonal = false;
+	m_bBidirectional = false;
+	m_bDrawDebugTexts = true;
 }
 
 // Init algo datas
@@ -45,8 +49,6 @@ void Dijkstra::Start(void)
 
 	m_vCurrentNode = m_pGrid->GetStart();
 	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance = 0;
-
-	m_bDrawDebugTexts = true;
 }
 
 // Async exec
@@ -73,6 +75,12 @@ bool Dijkstra::Execute(void)
 
 		// Update dist
 		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
+		
+		//TODO check totu cassé
+		// Special case with diagonale, do not override cheapest dist
+		if (m_bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].distance)
+			continue;
+		
 		m_aaWorker[vNode.first][vNode.second].distance = newDist;
 		
 		// Update prev
@@ -109,7 +117,10 @@ void Dijkstra::DrawGui(void)
 {
 	if (ImGui::CollapsingHeader("Dijkstra"))
 	{
-		ImGui::Button("launch algo");
+		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
+		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
+
+		ImGui::Checkbox("Distances text", &m_bDrawDebugTexts);
 	}
 }
 
@@ -199,5 +210,37 @@ void Dijkstra::ComputeNeighboursOfCurrent(void)
 	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
+	}
+
+	//TODO diagonal valide que si les deux blocs médians sont pas des murs
+	if (m_bUseDiagonal)
+	{
+		// Top Left
+		vTestNode.first -= 1;
+		if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Top Right
+		vTestNode.second += 2;
+		if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Bottom Right
+		vTestNode.first += 2;
+		if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Bottom Left
+		vTestNode.second -= 2;
+		if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
 	}
 }

@@ -36,9 +36,15 @@ private:
 	std::vector<std::pair<int, int>> m_aNeighbours;
 
 	std::pair<int, int> m_vCurrentNode;
+	
+	// Options
+	//TODO Enum heuristiques. Avec Null pour simuler un Dijkstra
+	bool m_bUseDiagonal;
+	bool m_bBidirectional;
 
-	//Debug info
+	bool m_bDrawDebugTexts;
+
+	// Debug info
 	std::vector<sf::Vertex> m_aPath;
 	sf::Text m_aTexts[GRID_SIZE * GRID_SIZE];
-	bool m_bDrawDebugTexts = false;
 };

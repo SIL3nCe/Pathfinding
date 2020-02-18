@@ -148,13 +148,7 @@ int main()
         
         ImGui::SFML::Update(window, dtTime);
 
-        if (ImGui::Begin("Stats"))
-        {
-            ImGui::LabelText("...", "Length: ");
-            ImGui::LabelText("...", "Time: ");
-            ImGui::LabelText("...", "Steps: ");
-            ImGui::End();
-        }
+        pCurrentAlgo->DrawGuiStatistics();
 
         if (ImGui::Begin("Algorithmes"))
         {

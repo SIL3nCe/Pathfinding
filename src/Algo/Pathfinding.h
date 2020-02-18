@@ -27,8 +27,16 @@ public:
 	// Clear debug infos
 	virtual void Clear(void) = 0;
 
+	virtual void DrawGuiStatistics(void);
+
 protected:
 	Grid * m_pGrid;
 
 	sf::Font * m_pFont;
+
+	// Stats
+	float m_fLength;
+	float m_fTime;
+	float m_fTimeAsync;
+	int m_steps;
 };

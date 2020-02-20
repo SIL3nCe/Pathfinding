@@ -41,10 +41,11 @@ int main()
     }
 
     Pathfinding* pCurrentAlgo = aAlgo[0];
+    pCurrentAlgo->m_bGuiOpen = true;
 
     bool bExecAlgo = false;
 
-    // Time datas
+    // Time datas for async exec
     float fAlgoExecTime = 0.01f;
     float fAlgoExecDt = 0.5f;
 
@@ -82,6 +83,17 @@ int main()
                         {
                             bExecAlgo = true;
                             grid.Clear();
+
+                            // Select algo to execute (first found with gui open)
+                            for (Pathfinding* pAlgo : aAlgo)
+                            {
+                                if (pAlgo->m_bGuiOpen)
+                                {
+                                    pCurrentAlgo = pAlgo;
+                                    break;
+                                }
+                            }
+
                             pCurrentAlgo->Clear();
                             pCurrentAlgo->Start();
                         }

@@ -25,13 +25,15 @@ void AStar::Initialize(Grid& grid, sf::Font& font)
 	}
 
 	m_eHeuristic = EHeuristics::Manhattan;
-	m_bUseDiagonal = false;
+	m_bUseDiagonal = true;
 	m_bBidirectional = false;
-	m_bDrawDebugTexts = true;
+	m_bDrawDebugTexts = false;
 }
 
 void AStar::Start(void)
 {
+	Pathfinding::Start();
+
 	m_aNodeQueue = {}; // Queue clear
 
 	for (int i = 0; i < GRID_SIZE; ++i)
@@ -66,6 +68,8 @@ bool AStar::Execute(void)
 	{
 		return false;
 	}
+
+	m_steps++;
 
 	// Get its neihbours
 	ComputeNeighboursOfCurrent();
@@ -108,12 +112,19 @@ void AStar::Stop(void)
 		}
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
 	}
+
+	m_fLength = m_aPath.size(); // TODO handle diagonals length
+
+	Pathfinding::Stop();
 }
 
 void AStar::DrawGui(void)
 {
-	if (ImGui::CollapsingHeader("A*"))
+	m_bGuiOpen = false;
+	if (ImGui::CollapsingHeader("A*", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		m_bGuiOpen = true;
+
 		if (ImGui::RadioButton("Manhattan", m_eHeuristic == EHeuristics::Manhattan)) { m_eHeuristic = EHeuristics::Manhattan; }
 		if (ImGui::RadioButton("Euclidean", m_eHeuristic == EHeuristics::Euclidean)) { m_eHeuristic = EHeuristics::Euclidean; }
 		if (ImGui::RadioButton("Chebyshev", m_eHeuristic == EHeuristics::Chebyshev)) { m_eHeuristic = EHeuristics::Chebyshev; }
@@ -123,7 +134,9 @@ void AStar::DrawGui(void)
 	
 		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
 		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
-	
+
+		ImGui::Separator();
+
 		ImGui::Checkbox("Heuristique value text", &m_bDrawDebugTexts);
 	}
 }

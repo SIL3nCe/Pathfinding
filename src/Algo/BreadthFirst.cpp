@@ -6,6 +6,8 @@ using namespace std;
 
 void BreadthFirst::Start(void)
 {
+	Pathfinding::Start();
+
 	m_aNodeQueue = {}; // Queue clear
 
 	for (int i = 0; i < GRID_SIZE; ++i)
@@ -20,6 +22,9 @@ void BreadthFirst::Start(void)
 	const pair<int, int>& vStart = m_pGrid->GetStart();
 	m_aNodeQueue.push(vStart);
 	m_aaWorker[vStart.first][vStart.second].bDiscovered = true;
+
+	m_bUseDiagonal = false;
+	m_bBidirectional = false;
 }
 
 bool BreadthFirst::Execute(void)
@@ -37,6 +42,8 @@ bool BreadthFirst::Execute(void)
 	// Current is end of path
 	if (m_vCurrentNode == m_pGrid->GetEnd())
 		return false;
+
+	m_steps++;
 
 	// Get its neihbours
 	ComputeNeighboursOfCurrent();
@@ -78,13 +85,21 @@ void BreadthFirst::Stop(void)
 		}
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vParent;
 	}
+
+	m_fLength = m_aPath.size(); // TODO handle diagonals length
+
+	Pathfinding::Stop();
 }
 
 void BreadthFirst::DrawGui(void)
 {
+	m_bGuiOpen = false;
 	if (ImGui::CollapsingHeader("Breadth First"))
 	{
-		ImGui::Button("launch algo");
+		m_bGuiOpen = true;
+
+		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
+		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
 	}
 }
 

@@ -11,13 +11,13 @@ public:
 	virtual void Initialize(Grid& grid, sf::Font& font);
 
 	// Begin, init datas
-	virtual void Start(void) = 0;
+	virtual void Start(void);
 
 	// Async exec of algo
 	virtual bool Execute(void) = 0;
 
 	// End, compute path
-	virtual void Stop(void) = 0;
+	virtual void Stop(void);
 
 	// Draw GUI
 	virtual void DrawGui(void) = 0;
@@ -29,6 +29,9 @@ public:
 
 	virtual void DrawGuiStatistics(void);
 
+public:
+	bool m_bGuiOpen; // Flag to know if algo Gui is open or not
+
 protected:
 	Grid * m_pGrid;
 
@@ -36,7 +39,12 @@ protected:
 
 	// Stats
 	float m_fLength;
+
+	sf::Clock m_clock;
 	float m_fTime;
-	float m_fTimeAsync;
+
+	sf::Clock m_asynClock;
+	float m_fAsyncTime;
+
 	int m_steps;
 };

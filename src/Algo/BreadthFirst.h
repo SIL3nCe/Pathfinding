@@ -32,6 +32,10 @@ private:
 
 	std::pair<int, int> m_vCurrentNode;
 
+	//Options
+	bool m_bUseDiagonal;
+	bool m_bBidirectional;
+
 	//Debug info
 	std::vector<sf::Vertex> m_aPath;
 };

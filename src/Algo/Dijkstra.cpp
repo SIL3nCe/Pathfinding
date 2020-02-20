@@ -26,12 +26,14 @@ void Dijkstra::Initialize(Grid& grid, sf::Font& font)
 
 	m_bUseDiagonal = false;
 	m_bBidirectional = false;
-	m_bDrawDebugTexts = true;
+	m_bDrawDebugTexts = false;
 }
 
 // Init algo datas
 void Dijkstra::Start(void)
 {
+	Pathfinding::Start();
+
 	m_aNodeQueue.clear();
 	m_aNeighbours.clear();
 
@@ -64,6 +66,8 @@ bool Dijkstra::Execute(void)
 		return false;
 	}
 
+	m_steps++;
+
 	// Get its neihbours
 	ComputeNeighboursOfCurrent();
 
@@ -76,7 +80,6 @@ bool Dijkstra::Execute(void)
 		// Update dist
 		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
 		
-		//TODO check totu cassé
 		// Special case with diagonale, do not override cheapest dist
 		if (m_bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].distance)
 			continue;
@@ -111,12 +114,19 @@ void Dijkstra::Stop(void)
 		}
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
 	}
+
+	m_fLength = m_aPath.size(); // TODO handle diagonals length
+
+	Pathfinding::Stop();
 }
 
 void Dijkstra::DrawGui(void)
 {
+	m_bGuiOpen = false;
 	if (ImGui::CollapsingHeader("Dijkstra"))
 	{
+		m_bGuiOpen = true;
+
 		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
 		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
 

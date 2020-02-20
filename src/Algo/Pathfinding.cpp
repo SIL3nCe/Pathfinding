@@ -7,8 +7,25 @@ void Pathfinding::Initialize(Grid& grid, sf::Font& font)
 
     m_fLength = 0.0f;
     m_fTime = 0.0f;
-    m_fTimeAsync = 0.0f;
+    m_fAsyncTime = 0.0f;
     m_steps = 0;
+
+    m_bGuiOpen = true;
+}
+
+void Pathfinding::Start(void)
+{
+    m_fLength = 0.0f;
+    m_fTime = 0.0f;
+    m_fAsyncTime = 0.0f;
+    m_steps = 0;
+
+    m_asynClock.restart();
+}
+
+void Pathfinding::Stop(void)
+{
+    m_fAsyncTime = m_asynClock.getElapsedTime().asSeconds();
 }
 
 void Pathfinding::DrawGuiStatistics(void)
@@ -17,17 +34,17 @@ void Pathfinding::DrawGuiStatistics(void)
     {
         {
             char buf[32];
-            sprintf(buf, "%f", m_fLength);
+            sprintf(buf, "%.3f", m_fLength);
             ImGui::LabelText(buf, "Length: ");
         }
         {
             char buf[32];
-            sprintf(buf, "%f", m_fTime);
+            sprintf(buf, "%.3f", m_fTime);
             ImGui::LabelText(buf, "Time: ");
         }
         {
             char buf[32];
-            sprintf(buf, "%f", m_fTimeAsync);
+            sprintf(buf, "%.3f", m_fAsyncTime);
             ImGui::LabelText(buf, "Time (Async): ");
         }
         {

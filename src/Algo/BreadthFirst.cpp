@@ -4,6 +4,14 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 
+void BreadthFirst::Initialize(Grid& grid, sf::Font& font)
+{
+	Pathfinding::Initialize(grid, font);
+
+	m_bUseDiagonal = false;
+	m_bBidirectional = false;
+}
+
 void BreadthFirst::Start(void)
 {
 	Pathfinding::Start();
@@ -23,8 +31,6 @@ void BreadthFirst::Start(void)
 	m_aNodeQueue.push(vStart);
 	m_aaWorker[vStart.first][vStart.second].bDiscovered = true;
 
-	m_bUseDiagonal = false;
-	m_bBidirectional = false;
 }
 
 bool BreadthFirst::Execute(void)

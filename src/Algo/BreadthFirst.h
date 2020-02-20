@@ -6,6 +6,8 @@
 class BreadthFirst : public Pathfinding
 {
 public:
+	virtual void Initialize(Grid& grid, sf::Font& font) override;
+
 	virtual void Start(void) override;
 	virtual bool Execute(void) override;
 	virtual void Stop(void) override;

@@ -130,6 +130,8 @@ void Dijkstra::DrawGui(void)
 		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
 		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
 
+		ImGui::Separator();
+
 		ImGui::Checkbox("Distances text", &m_bDrawDebugTexts);
 	}
 }

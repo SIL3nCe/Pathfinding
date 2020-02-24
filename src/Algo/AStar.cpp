@@ -27,6 +27,7 @@ void AStar::Initialize(Grid& grid, sf::Font& font)
 	m_eHeuristic = EHeuristics::Manhattan;
 	m_bUseDiagonal = true;
 	m_bBidirectional = false;
+	m_fWeight = 1.0f;
 	m_bDrawDebugTexts = false;
 }
 
@@ -73,6 +74,8 @@ bool AStar::Execute(void)
 
 	// Get its neihbours
 	ComputeNeighboursOfCurrent();
+
+	//TODO update previous issue give suboptimal even with neutral weight
 
 	// Compute distance to those neighbours
 	int nNeighbours = m_aNeighbours.size();
@@ -134,7 +137,8 @@ void AStar::DrawGui(void)
 	
 		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
 		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
-
+		ImGui::InputFloat("Weight", &m_fWeight, 1.0f, 10.0f, 2, ImGuiInputTextFlags_AutoSelectAll);	
+		
 		ImGui::Separator();
 
 		ImGui::Checkbox("Heuristique value text", &m_bDrawDebugTexts);
@@ -261,9 +265,9 @@ float AStar::ComputeHeuristic(const std::pair<int, int>& start, const std::pair<
 {
 	switch (m_eHeuristic)
 	{
-		case EHeuristics::Manhattan: { return Utility::GetManhattanDistance(start, end); };
-		case EHeuristics::Euclidean: { return Utility::GetEuclideanDistance(start, end); };
-		case EHeuristics::Chebyshev: {return Utility::GetChebyshevDistance(start, end); };
+		case EHeuristics::Manhattan: { return Utility::GetManhattanDistance(start, end) * m_fWeight; };
+		case EHeuristics::Euclidean: { return Utility::GetEuclideanDistance(start, end) * m_fWeight; };
+		case EHeuristics::Chebyshev: {return Utility::GetChebyshevDistance(start, end) * m_fWeight; };
 		case EHeuristics::Null: { return 0; };
 	}
 

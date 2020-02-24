@@ -50,6 +50,7 @@ private:
 
 	bool m_bUseDiagonal;
 	bool m_bBidirectional;
+	float m_fWeight;
 
 	bool m_bDrawDebugTexts;
 

@@ -126,36 +126,63 @@ void BreadthFirst::ComputeNeighboursOfCurrent(void)
 {
 	m_aNeighbours.clear();
 
-	pair<int, int> vTestNode = m_vCurrentNode;
+	pair<int, int> vTestNode = m_vCurrentNode + Utility::CellTop;
 
-	// Up
-	vTestNode.first -= 1;
+	// Top
 	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}
 
 	// Right
-	vTestNode.first += 1;
-	vTestNode.second += 1;
+	vTestNode = m_vCurrentNode + Utility::CellRight;
 	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}
 
-	// Down
-	vTestNode.first += 1;
-	vTestNode.second -= 1;
+	// Bottom
+	vTestNode = m_vCurrentNode + Utility::CellBottom;
 	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
 	}
 
 	// Left
-	vTestNode.first -= 1;
-	vTestNode.second -= 1;
+	vTestNode = m_vCurrentNode + Utility::CellLeft;
 	if (m_pGrid->IsWalkable(vTestNode))
 	{
 		m_aNeighbours.push_back(vTestNode);
+	}
+
+	if (m_bUseDiagonal)
+	{
+		// Top Left
+		vTestNode = m_vCurrentNode + Utility::CellTopLeft;
+		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellTop) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellLeft))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Top Right
+		vTestNode = m_vCurrentNode + Utility::CellTopRight;
+		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellTop) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellRight))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Bottom Right
+		vTestNode = m_vCurrentNode + Utility::CellBottomRight;
+		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellBottom) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellRight))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
+
+		// Bottom Left
+		vTestNode = m_vCurrentNode + Utility::CellBottomLeft;
+		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellBottom) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellLeft))
+		{
+			m_aNeighbours.push_back(vTestNode);
+		}
 	}
 }

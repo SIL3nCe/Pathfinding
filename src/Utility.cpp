@@ -4,6 +4,21 @@
 #include <cmath>
 using namespace std;
 
+const pair<int, int> Utility::CellTop(-1, 0);
+const pair<int, int> Utility::CellRight(0, 1);
+const pair<int, int> Utility::CellBottom(1, 0);
+const pair<int, int> Utility::CellLeft(0, -1);
+
+const pair<int, int> Utility::CellTopLeft(-1, -1);
+const pair<int, int> Utility::CellTopRight(-1, 1);
+const pair<int, int> Utility::CellBottomLeft(1, -1);
+const pair<int, int> Utility::CellBottomRight(1, 1);
+
+std::pair<int, int> operator+(const std::pair<int, int>& l, const std::pair<int, int>& r)
+{
+	return std::make_pair(l.first + r.first, l.second + r.second);
+}
+
 // fct(x,y) : |x1 - x2| + |y1 - y2|
 /*static*/ int Utility::GetManhattanDistance(const pair<int, int>& start, const pair<int, int>& end)
 {

@@ -171,6 +171,13 @@ int main()
             ImGui::End();
         }
 
+        // Global options
+        if (ImGui::Begin("Options"))
+        {
+            ImGui::SliderFloat("Animation Speed", &fAlgoExecTime, 0.001f, 0.1f);
+            ImGui::End();
+        }
+
         window.clear();
 
         grid.Draw(window);

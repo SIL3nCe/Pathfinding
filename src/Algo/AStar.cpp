@@ -74,9 +74,7 @@ bool AStar::Execute(void)
 
 	// Get its neihbours
 	ComputeNeighboursOfCurrent();
-
-	//TODO update previous issue give suboptimal even with neutral weight
-
+	
 	// Compute distance to those neighbours
 	int nNeighbours = m_aNeighbours.size();
 	for (int i = 0; i < nNeighbours; ++i)
@@ -92,7 +90,12 @@ bool AStar::Execute(void)
 			pData->vPrevious = m_vCurrentNode;
 			pData->cost = newCost;
 			pData->heuristique = pData->cost + ComputeHeuristic(vNode, m_pGrid->GetEnd());
-			
+
+			// Update text
+			char strNum[10];
+			sprintf(strNum, "%i", pData->heuristique);
+			m_aTexts[vNode.first * GRID_SIZE + vNode.second].setString(strNum);
+
 			m_aNodeQueue.push_back(vNode);
 			m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
 		}

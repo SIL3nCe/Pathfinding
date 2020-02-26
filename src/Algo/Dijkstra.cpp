@@ -78,7 +78,7 @@ bool Dijkstra::Execute(void)
 		const pair<int, int>& vNode = m_aNeighbours[i];
 
 		// Update dist
-		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1;
+		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1; // TODO Get real cost for diagonals
 		
 		// Special case with diagonale, do not override cheapest dist
 		if (m_bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].distance)
@@ -91,7 +91,7 @@ bool Dijkstra::Execute(void)
 		
 		// Update text
 		char strNum[10];
-		sprintf(strNum, "%i", newDist);
+		sprintf(strNum, "%d", newDist);
 		m_aTexts[vNode.first * GRID_SIZE + vNode.second].setString(strNum);
 
 		m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
@@ -115,7 +115,7 @@ void Dijkstra::Stop(void)
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
 	}
 
-	m_fLength = m_aPath.size(); // TODO handle diagonals length
+	m_fLength = m_aPath.size() - 1; // TODO handle diagonals length
 
 	Pathfinding::Stop();
 }
@@ -123,6 +123,8 @@ void Dijkstra::Stop(void)
 void Dijkstra::DrawGui(void)
 {
 	m_bGuiOpen = false;
+
+	ImGui::PushID("Dijkstra");
 	if (ImGui::CollapsingHeader("Dijkstra"))
 	{
 		m_bGuiOpen = true;
@@ -134,6 +136,7 @@ void Dijkstra::DrawGui(void)
 
 		ImGui::Checkbox("Distances text", &m_bDrawDebugTexts);
 	}
+	ImGui::PopID();
 }
 
 void Dijkstra::Draw(sf::RenderWindow& window)

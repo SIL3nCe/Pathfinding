@@ -92,7 +92,7 @@ void BreadthFirst::Stop(void)
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vParent;
 	}
 
-	m_fLength = m_aPath.size(); // TODO handle diagonals length
+	m_fLength = m_aPath.size() - 1; // TODO handle diagonals length
 
 	Pathfinding::Stop();
 }
@@ -100,6 +100,8 @@ void BreadthFirst::Stop(void)
 void BreadthFirst::DrawGui(void)
 {
 	m_bGuiOpen = false;
+
+	ImGui::PushID("Breadth First");
 	if (ImGui::CollapsingHeader("Breadth First"))
 	{
 		m_bGuiOpen = true;
@@ -107,6 +109,7 @@ void BreadthFirst::DrawGui(void)
 		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
 		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
 	}
+	ImGui::PopID();
 }
 
 void BreadthFirst::Draw(sf::RenderWindow& window)

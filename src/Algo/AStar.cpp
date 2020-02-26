@@ -46,7 +46,7 @@ void AStar::Start(void)
 			m_aaWorker[i][j].heuristique = ComputeHeuristic({i, j}, m_pGrid->GetEnd());
 
 			char strNum[10];
-			sprintf(strNum, "%i", m_aaWorker[i][j].heuristique);
+			sprintf(strNum, "%d", m_aaWorker[i][j].heuristique);
 			m_aTexts[i * GRID_SIZE + j].setString(strNum);
 
 			m_aaWorker[i][j].vPrevious = { -1, -1 };
@@ -81,7 +81,7 @@ bool AStar::Execute(void)
 	{
 		const pair<int, int>& vNode = m_aNeighbours[i];
 
-		int newCost = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].cost + 1;
+		int newCost = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].cost + 1; // TODO Get real cost for diagonals
 
 		SDatas * pData = &m_aaWorker[vNode.first][vNode.second];
 
@@ -93,7 +93,7 @@ bool AStar::Execute(void)
 
 			// Update text
 			char strNum[10];
-			sprintf(strNum, "%i", pData->heuristique);
+			sprintf(strNum, "%d", pData->heuristique);
 			m_aTexts[vNode.first * GRID_SIZE + vNode.second].setString(strNum);
 
 			m_aNodeQueue.push_back(vNode);
@@ -119,7 +119,7 @@ void AStar::Stop(void)
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
 	}
 
-	m_fLength = m_aPath.size(); // TODO handle diagonals length
+	m_fLength = m_aPath.size() - 1; // TODO handle diagonals length
 
 	Pathfinding::Stop();
 }
@@ -127,6 +127,8 @@ void AStar::Stop(void)
 void AStar::DrawGui(void)
 {
 	m_bGuiOpen = false;
+
+	ImGui::PushID("A*");
 	if (ImGui::CollapsingHeader("A*", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		m_bGuiOpen = true;
@@ -146,6 +148,7 @@ void AStar::DrawGui(void)
 
 		ImGui::Checkbox("Heuristique value text", &m_bDrawDebugTexts);
 	}
+	ImGui::PopID();
 }
 
 void AStar::Draw(sf::RenderWindow& window)

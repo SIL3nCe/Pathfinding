@@ -44,6 +44,7 @@ int main()
     pCurrentAlgo->m_bGuiOpen = true;
 
     bool bExecAlgo = false;
+    bool bPause = false;
 
     // Time datas for async exec
     float fAlgoExecTime = 0.01f;
@@ -78,8 +79,8 @@ int main()
                     }
                     else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
                     {
-                        //TODO pause when hitting space again, add bool to know if need to clear
-                        if (!bExecAlgo)
+                        // Start
+                        if (!bExecAlgo && !bPause)
                         {
                             bExecAlgo = true;
                             grid.Clear();
@@ -97,8 +98,20 @@ int main()
                             pCurrentAlgo->Clear();
                             pCurrentAlgo->Start();
                         }
+                        // Unpause
+                        else if (bPause)
+                        {
+                            bExecAlgo = true;
+                            bPause = false;
+                        }
+                        // Pause
+                        else
+                        {
+                            bExecAlgo = false;
+                            bPause = true;
+                        }
                     }
-                    else if (sf::Keyboard::Escape == event.key.code && bExecAlgo)
+                    else if (sf::Keyboard::Escape == event.key.code && (bExecAlgo || bPause))
                     {
                         bExecAlgo = false;
                         grid.Clear();

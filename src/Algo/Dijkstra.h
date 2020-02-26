@@ -23,7 +23,7 @@ private:
 private:
 	struct SDatas
 	{
-		int distance;
+		float fDistance;
 		std::pair<int, int> vPrevious;
 	};
 

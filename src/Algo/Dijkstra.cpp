@@ -41,7 +41,7 @@ void Dijkstra::Start(void)
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			m_aaWorker[i][j].distance = INT_MAX;
+			m_aaWorker[i][j].fDistance = UINT_MAX;
 			m_aaWorker[i][j].vPrevious = {-1, -1};
 			m_aNodeQueue.push_back({i, j});
 
@@ -50,7 +50,7 @@ void Dijkstra::Start(void)
 	}
 
 	m_vCurrentNode = m_pGrid->GetStart();
-	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance = 0;
+	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance = 0.0f;
 }
 
 // Async exec
@@ -78,20 +78,21 @@ bool Dijkstra::Execute(void)
 		const pair<int, int>& vNode = m_aNeighbours[i];
 
 		// Update dist
-		int newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].distance + 1; // TODO Get real cost for diagonals
+		float fAdd = (vNode.first == m_vCurrentNode.first || vNode.second == m_vCurrentNode.second) ? 1.0f : sqrt(2);
+		float newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance + fAdd;
 		
 		// Special case with diagonale, do not override cheapest dist
-		if (m_bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].distance)
+		if (m_bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].fDistance)
 			continue;
 		
-		m_aaWorker[vNode.first][vNode.second].distance = newDist;
+		m_aaWorker[vNode.first][vNode.second].fDistance = newDist;
 		
 		// Update prev
 		m_aaWorker[vNode.first][vNode.second].vPrevious = m_vCurrentNode;
 		
 		// Update text
 		char strNum[10];
-		sprintf(strNum, "%d", newDist);
+		sprintf(strNum, "%0.2f", newDist);
 		m_aTexts[vNode.first * GRID_SIZE + vNode.second].setString(strNum);
 
 		m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
@@ -171,7 +172,7 @@ void Dijkstra::ComputeMinDistNodeInQueue(void)
 	int nNode = m_aNodeQueue.size();
 	for (int i = 0; i < nNode; ++i)
 	{
-		float fNodeDist = m_aaWorker[m_aNodeQueue[i].first][m_aNodeQueue[i].second].distance;
+		float fNodeDist = m_aaWorker[m_aNodeQueue[i].first][m_aNodeQueue[i].second].fDistance;
 		if (fNodeDist < currDist)
 		{
 			id = i;

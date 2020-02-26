@@ -27,7 +27,7 @@ private:
 	{
 		bool bClosed;
 		int heuristique;
-		int cost;
+		float cost;
 		std::pair<int, int> vPrevious;
 	};
 

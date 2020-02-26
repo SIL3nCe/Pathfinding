@@ -42,7 +42,7 @@ void AStar::Start(void)
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
 			m_aaWorker[i][j].bClosed = false;
-			m_aaWorker[i][j].cost = INT_MAX;
+			m_aaWorker[i][j].cost = UINT_MAX;
 			m_aaWorker[i][j].heuristique = ComputeHeuristic({i, j}, m_pGrid->GetEnd());
 
 			char strNum[10];
@@ -56,7 +56,7 @@ void AStar::Start(void)
 	const pair<int, int>& vStart = m_pGrid->GetStart();
 	m_aNodeQueue.push_back(vStart);
 	m_aaWorker[vStart.first][vStart.second].bClosed = true;
-	m_aaWorker[vStart.first][vStart.second].cost = 0;
+	m_aaWorker[vStart.first][vStart.second].cost = 0.0f;
 }
 
 bool AStar::Execute(void)
@@ -81,7 +81,8 @@ bool AStar::Execute(void)
 	{
 		const pair<int, int>& vNode = m_aNeighbours[i];
 
-		int newCost = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].cost + 1; // TODO Get real cost for diagonals
+		float fAdd = (vNode.first == m_vCurrentNode.first || vNode.second == m_vCurrentNode.second) ? 1.0f : sqrt(2);
+		float newCost = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].cost + fAdd;
 
 		SDatas * pData = &m_aaWorker[vNode.first][vNode.second];
 

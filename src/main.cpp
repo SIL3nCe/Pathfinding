@@ -14,6 +14,7 @@ int main()
     window.setFramerateLimit(60);
 
     ImGui::SFML::Init(window);
+    ImGuiIO& io = ImGui::GetIO();
 
     sf::Font font;
     if (!font.loadFromFile("Resources\\Gold-Regular.ttf"))
@@ -57,7 +58,7 @@ int main()
         sf::Time dtTime = clock.restart();
         float dt = dtTime.asSeconds();
 
-        bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+        bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left) && !io.WantCaptureMouse;
         
         sf::Event event;
         while (window.pollEvent(event))
@@ -122,7 +123,7 @@ int main()
 
                 case  sf::Event::MouseButtonPressed:
                 {
-                    if (!bExecAlgo)
+                    if (bMouseButtonPressed && !bExecAlgo)
                     {
                         grid.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
                     }
@@ -131,12 +132,10 @@ int main()
 
                 case sf::Event::MouseMoved:
                 {
-                    if (!bExecAlgo)
+                    if (bMouseButtonPressed && !bExecAlgo)
                     {
-                        if (bMouseButtonPressed)
-                        {
-                            grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
-                        }
+
+                        grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
                     }
                 }
                 break;

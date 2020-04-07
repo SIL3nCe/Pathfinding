@@ -4,100 +4,82 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 
-void BreadthFirst::Initialize(Grid& grid, sf::Font& font)
+std::vector<std::pair<int, int>>& BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal)
 {
-	Pathfinding::Initialize(grid, font);
+	queue<pair<int, int>> aQueue;
 
-	m_bUseDiagonal = false;
-	m_bBidirectional = false;
-}
-
-void BreadthFirst::Start(void)
-{
-	Pathfinding::Start();
-
-	m_aNodeQueue = {}; // Queue clear
-
-	for (int i = 0; i < GRID_SIZE; ++i)
+	for (int i = 0; i < Grid.GetHeight(); ++i)
 	{
-		for (int j = 0; j < GRID_SIZE; ++j)
+		vector<SDatas> aLine(Grid.GetWidth());
+		for (int j = 0; j < Grid.GetWidth(); ++j)
 		{
-			m_aaWorker[i][j].bDiscovered = false;
-			m_aaWorker[i][j].vParent = { -1, -1 };
+			SDatas datas({ false, {-1, -1} });
+			aLine.push_back(datas);
 		}
+		m_aaWorker.push_back(aLine);
 	}
 
-	const pair<int, int>& vStart = m_pGrid->GetStart();
-	m_aNodeQueue.push(vStart);
+	const pair<int, int>& vStart = Grid.GetStart();
+	aQueue.push(vStart);
 	m_aaWorker[vStart.first][vStart.second].bDiscovered = true;
 
-}
-
-bool BreadthFirst::Execute(void)
-{
-	// Unreachable
-	if (m_aNodeQueue.empty())
+	while (true)
 	{
-		m_vCurrentNode.first = -1;
-		return false;
-	}
-
-	m_vCurrentNode = m_aNodeQueue.front();
-	m_aNodeQueue.pop();
-	
-	// Current is end of path
-	if (m_vCurrentNode == m_pGrid->GetEnd())
-		return false;
-
-	m_steps++;
-
-	// Get its neihbours
-	ComputeNeighboursOfCurrent();
-
-	// Compute distance to those neighbours
-	int nNeighbours = m_aNeighbours.size();
-	for (int i = 0; i < nNeighbours; ++i)
-	{
-		const pair<int, int>& vNode = m_aNeighbours[i];
-
-		if (!m_aaWorker[vNode.first][vNode.second].bDiscovered) 
+		// Unreachable
+		if (aQueue.empty())
 		{
-			// Mark as discovered
-			m_aaWorker[vNode.first][vNode.second].bDiscovered = true;
-
-			// Update prev
-			m_aaWorker[vNode.first][vNode.second].vParent = m_vCurrentNode;
-
-			// Enqueue node
-			m_aNodeQueue.push(vNode);
-
-			m_pGrid->SetCaseColor(vNode, sf::Color::Yellow); // Discovered and in queue
+			m_vCurrentNode.first = -1;
+			break;
 		}
+
+		m_vCurrentNode = aQueue.front();
+		aQueue.pop();
+
+		// Current is end of path
+		if (m_vCurrentNode == Grid.GetEnd())
+			break;
+
+		// Get its neihbours
+		Grid.ComputeNeighboursOfCurrent(m_vCurrentNode, bUseDiagonal, m_aNeighbours);
+
+		// Compute distance to those neighbours
+		int nNeighbours = m_aNeighbours.size();
+		for (int i = 0; i < nNeighbours; ++i)
+		{
+			const pair<int, int>& vNode = m_aNeighbours[i];
+
+			if (!m_aaWorker[vNode.first][vNode.second].bDiscovered)
+			{
+				// Mark as discovered
+				m_aaWorker[vNode.first][vNode.second].bDiscovered = true;
+
+				// Update prev
+				m_aaWorker[vNode.first][vNode.second].vParent = m_vCurrentNode;
+
+				// Enqueue node
+				aQueue.push(vNode);
+
+				//m_pGrid->SetCaseColor(vNode, sf::Color::Yellow); // Discovered and in queue
+			}
+		}
+
+		//m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan); // Discovered and no more in queue
 	}
 
-	m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan); // Discovered and no more in queue
-	
-	return true;
-}
+	// Construct and return path
+	m_aFinalPath.clear();
 
-void BreadthFirst::Stop(void)
-{
+	m_aFinalPath.push_back(Grid.GetEnd());
 	while (m_vCurrentNode.first != -1)
 	{
-		sf::Vector2f vLocation;
-		if (m_pGrid->GetScreenCoordFromCell(m_vCurrentNode, vLocation))
-		{
-			m_aPath.push_back(sf::Vertex(vLocation, sf::Color::Magenta));
-		}
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vParent;
+		m_aFinalPath.push_back(m_vCurrentNode);
 	}
 
-	m_fLength = m_aPath.size() - 1; // TODO handle diagonals length
-
-	Pathfinding::Stop();
+	return m_aFinalPath;
 }
-
-void BreadthFirst::DrawGui(void)
+/*
+void BreadthFirst::DrawGui()
 {
 	m_bGuiOpen = false;
 
@@ -111,81 +93,4 @@ void BreadthFirst::DrawGui(void)
 	}
 	ImGui::PopID();
 }
-
-void BreadthFirst::Draw(sf::RenderWindow& window)
-{
-	if (!m_aPath.empty())
-	{
-		window.draw(&m_aPath[0], m_aPath.size(), sf::LineStrip);
-	}
-}
-
-void BreadthFirst::Clear(void)
-{
-	m_aPath.clear();
-}
-
-void BreadthFirst::ComputeNeighboursOfCurrent(void)
-{
-	m_aNeighbours.clear();
-
-	pair<int, int> vTestNode = m_vCurrentNode + Utility::CellTop;
-
-	// Top
-	if (m_pGrid->IsWalkable(vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	// Right
-	vTestNode = m_vCurrentNode + Utility::CellRight;
-	if (m_pGrid->IsWalkable(vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	// Bottom
-	vTestNode = m_vCurrentNode + Utility::CellBottom;
-	if (m_pGrid->IsWalkable(vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	// Left
-	vTestNode = m_vCurrentNode + Utility::CellLeft;
-	if (m_pGrid->IsWalkable(vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	if (m_bUseDiagonal)
-	{
-		// Top Left
-		vTestNode = m_vCurrentNode + Utility::CellTopLeft;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellTop) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellLeft))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-
-		// Top Right
-		vTestNode = m_vCurrentNode + Utility::CellTopRight;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellTop) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellRight))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-
-		// Bottom Right
-		vTestNode = m_vCurrentNode + Utility::CellBottomRight;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellBottom) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellRight))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-
-		// Bottom Left
-		vTestNode = m_vCurrentNode + Utility::CellBottomLeft;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellBottom) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellLeft))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-	}
-}
+*/

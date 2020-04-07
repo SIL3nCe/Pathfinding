@@ -4,6 +4,29 @@
 
 std::pair<int, int> operator+(const std::pair<int, int>& l, const std::pair<int, int>& r);
 
+
+enum class EOperations : unsigned int
+{
+	QueuedNode,
+	ClosedNode
+};
+
+void DefaultOnDoingOperation(EOperations eOperation, const std::pair<int, int>& vCellCoord);
+
+struct SOperation
+{
+	EOperations eOperation;
+	std::pair<int, int> vCellCoord;
+};
+
+enum class EHeuristic : unsigned int
+{
+	Manhattan,
+	Euclidean,
+	Chebyshev,
+	Null
+};
+
 class Utility
 {
 public:

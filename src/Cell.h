@@ -17,10 +17,10 @@ public:
 
 	void Draw(sf::RenderWindow & window);
 
-	const sf::Vector2f GetScreenCoord(void) const;
+	const sf::Vector2f GetScreenCoord() const;
 
 	void SetState(ECellState eState, bool bForce = false);
-	ECellState GetState(void) const;
+	ECellState GetState() const;
 
 	void SetColor(const sf::Color& color);
 

@@ -1,24 +1,12 @@
 #pragma once
 
-#include "Pathfinding.h"
+#include "../GridWorker.h"
 #include <queue>
 
-class BreadthFirst : public Pathfinding
+class BreadthFirst
 {
 public:
-	virtual void Initialize(Grid& grid, sf::Font& font) override;
-
-	virtual void Start(void) override;
-	virtual bool Execute(void) override;
-	virtual void Stop(void) override;
-
-	virtual void DrawGui(void) override;
-
-	virtual void Draw(sf::RenderWindow& window) override;
-	virtual void Clear(void) override;
-
-private:
-	void ComputeNeighboursOfCurrent(void);
+	std::vector<std::pair<int, int>>& Execute(const GridWorker& Grid, bool bUseDiagonal);
 
 private:
 	struct SDatas
@@ -27,17 +15,11 @@ private:
 		std::pair<int, int> vParent;
 	};
 
-	SDatas m_aaWorker[GRID_SIZE][GRID_SIZE];
+	std::vector<std::vector<SDatas>> m_aaWorker;
 
-	std::queue<std::pair<int, int>> m_aNodeQueue;
 	std::vector<std::pair<int, int>> m_aNeighbours;
 
+	std::vector<std::pair<int, int>> m_aFinalPath;
+
 	std::pair<int, int> m_vCurrentNode;
-
-	//Options
-	bool m_bUseDiagonal;
-	bool m_bBidirectional;
-
-	//Debug info
-	std::vector<sf::Vertex> m_aPath;
 };

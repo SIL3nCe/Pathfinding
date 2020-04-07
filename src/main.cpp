@@ -1,55 +1,28 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#include "Grid.h"
+#include "Pathfinding.h"
 
-#include "Algo/Pathfinding.h"
-#include "Algo/Dijkstra.h"
-#include "Algo/BreadthFirst.h"
-#include "Algo/AStar.h"
+using namespace std;
+
+/*TODO
+    -système de previous/next/pause pour l'affichage des opérations
+    -DrawGui des algo à faire côté pas algo
+    -GridWorker en commun ? ou alors juste GetNeighbours et autres fct en commun en static dans Utility
+    -path dessiné pété quand pas de solution
+    -draw path after at operation stack end ? (en option, "show pass at debug end")
+    -nbr de cases dynamique ?
+*/
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 800), "Pathfinding");
-    window.setFramerateLimit(60);
+    //window.setFramerateLimit(120);
 
     ImGui::SFML::Init(window);
     ImGuiIO& io = ImGui::GetIO();
 
-    sf::Font font;
-    if (!font.loadFromFile("Resources\\Gold-Regular.ttf"))
-    {
-        printf("Cannot load font");
-    }
-
-    // Init grid
-    Grid grid;
-    grid.Initialize();
-
-    // Init algos
-    Dijkstra algo_Dijkstra;
-    BreadthFirst algo_BreadthFirst;
-    AStar algo_AStart;
-
-    std::vector<Pathfinding*> aAlgo;
-    aAlgo.push_back(&algo_AStart);
-    aAlgo.push_back(&algo_Dijkstra);
-    aAlgo.push_back(&algo_BreadthFirst);
-
-    for (Pathfinding* pAlgo : aAlgo)
-    {
-        pAlgo->Initialize(grid, font);
-    }
-
-    Pathfinding* pCurrentAlgo = aAlgo[0];
-    pCurrentAlgo->m_bGuiOpen = true;
-
-    bool bExecAlgo = false;
-    bool bPause = false;
-
-    // Time datas for async exec
-    float fAlgoExecTime = 0.01f;
-    float fAlgoExecDt = 0.5f;
+    Pathfinding pathfinding;
 
     sf::Clock clock;
 
@@ -59,7 +32,7 @@ int main()
         float dt = dtTime.asSeconds();
 
         bool bMouseButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left) && !io.WantCaptureMouse;
-        
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -68,84 +41,34 @@ int main()
             {
                 case sf::Event::KeyPressed:
                 {
-                    if (sf::Keyboard::R == event.key.code && !bMouseButtonPressed && !bExecAlgo)
+                    if (!bMouseButtonPressed)
                     {
-                        grid.Reset();
-                        pCurrentAlgo->Clear();
-                    }  
-                    else if (sf::Keyboard::C == event.key.code && !bMouseButtonPressed && !bExecAlgo)
-                    {
-                        grid.Clear();
-                        pCurrentAlgo->Clear();
-                    }
-                    else if (sf::Keyboard::Space == event.key.code && !bMouseButtonPressed)
-                    {
-                        // Start
-                        if (!bExecAlgo && !bPause)
-                        {
-                            bExecAlgo = true;
-                            grid.Clear();
-
-                            // Select algo to execute (first found with gui open)
-                            for (Pathfinding* pAlgo : aAlgo)
-                            {
-                                if (pAlgo->m_bGuiOpen)
-                                {
-                                    pCurrentAlgo = pAlgo;
-                                    break;
-                                }
-                            }
-
-                            pCurrentAlgo->Clear();
-                            pCurrentAlgo->Start();
-                        }
-                        // Unpause
-                        else if (bPause)
-                        {
-                            bExecAlgo = true;
-                            bPause = false;
-                        }
-                        // Pause
-                        else
-                        {
-                            bExecAlgo = false;
-                            bPause = true;
-                        }
-                    }
-                    else if (sf::Keyboard::Escape == event.key.code && (bExecAlgo || bPause))
-                    {
-                        bExecAlgo = false;
-                        grid.Clear();
-                        pCurrentAlgo->Clear();
+                        pathfinding.OnKeyPressed(event.key.code);
                     }
                 }
                 break;
 
                 case  sf::Event::MouseButtonPressed:
                 {
-                    if (bMouseButtonPressed && !bExecAlgo)
+                    if (bMouseButtonPressed)
                     {
-                        grid.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
+                        pathfinding.OnMouseClicked(event.mouseButton.x, event.mouseButton.y);
                     }
                 }
                 break;
 
                 case sf::Event::MouseMoved:
                 {
-                    if (bMouseButtonPressed && !bExecAlgo)
+                    if (bMouseButtonPressed)
                     {
-
-                        grid.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
+                        pathfinding.OnMouseMoved(event.mouseMove.x, event.mouseMove.y);
                     }
                 }
                 break;
 
                 case sf::Event::MouseButtonReleased:
                 {
-                    if (!bExecAlgo)
-                    {
-                        grid.OnMouseReleased();
-                    }
+                    pathfinding.OnMouseReleased();
                 }
                 break;
 
@@ -157,43 +80,13 @@ int main()
             }
         }
 
-        if (bExecAlgo)
-        {
-            fAlgoExecDt += dt;
-            if (fAlgoExecDt >= fAlgoExecTime)
-            {
-                fAlgoExecDt = 0.0f;
-                if (bExecAlgo = pCurrentAlgo->Execute(), !bExecAlgo)
-                {
-                    pCurrentAlgo->Stop();
-                }
-            }
-        }
-        
         ImGui::SFML::Update(window, dtTime);
-
-        pCurrentAlgo->DrawGuiStatistics();
-
-        if (ImGui::Begin("Algorithmes"))
-        {
-            for (Pathfinding* pAlgo : aAlgo)
-            {
-                pAlgo->DrawGui();
-            }
-            ImGui::End();
-        }
-
-        // Global options
-        if (ImGui::Begin("Options"))
-        {
-            ImGui::SliderFloat("Animation Speed", &fAlgoExecTime, 0.001f, 0.1f);
-            ImGui::End();
-        }
+        
+        pathfinding.Update(dt);
 
         window.clear();
 
-        grid.Draw(window);
-        pCurrentAlgo->Draw(window);
+        pathfinding.Draw(window);
 
         ImGui::SFML::Render(window);
 

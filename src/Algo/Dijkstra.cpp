@@ -4,124 +4,83 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
-void Dijkstra::Initialize(Grid& grid, sf::Font& font)
+std::vector<std::pair<int, int>>& Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal)
 {
-	Pathfinding::Initialize(grid, font);
+	vector<pair<int, int>> aQueue;
 
-	sf::Vector2f vLocation;
-	for (int i = 0; i < GRID_SIZE; ++i)
+	for (int i = 0; i < Grid.GetHeight(); ++i)
 	{
-		for (int j = 0; j < GRID_SIZE; ++j)
+		vector<SDatas> aLine(Grid.GetWidth());
+		for (int j = 0; j < Grid.GetWidth(); ++j)
 		{
-			if (m_pGrid->GetScreenCoordFromCell(i, j, vLocation))
-			{
-				m_aTexts[i * GRID_SIZE + j].setFont(*m_pFont);
-				m_aTexts[i * GRID_SIZE + j].setString("-");
-				m_aTexts[i * GRID_SIZE + j].setColor(sf::Color::Black);
-				m_aTexts[i * GRID_SIZE + j].setPosition({ vLocation.x - CELL_SIZE * 0.25f, vLocation.y - CELL_SIZE * 0.25f });
-				m_aTexts[i * GRID_SIZE + j].setCharacterSize(CELL_SIZE * 0.5);
-			}
+			SDatas datas({ static_cast<float>(UINT_MAX - 1), {-1, -1} });
+			aLine.push_back(datas);
+			aQueue.push_back({ i, j });
 		}
+		m_aaWorker.push_back(aLine);
 	}
 
-	m_bUseDiagonal = false;
-	m_bBidirectional = false;
-	m_bDrawDebugTexts = false;
-}
-
-// Init algo datas
-void Dijkstra::Start(void)
-{
-	Pathfinding::Start();
-
-	m_aNodeQueue.clear();
-	m_aNeighbours.clear();
-
-	for (int i = 0; i < GRID_SIZE; ++i)
-	{
-		for (int j = 0; j < GRID_SIZE; ++j)
-		{
-			m_aaWorker[i][j].fDistance = UINT_MAX;
-			m_aaWorker[i][j].vPrevious = {-1, -1};
-			m_aNodeQueue.push_back({i, j});
-
-			m_aTexts[i * GRID_SIZE + j].setString("-");
-		}
-	}
-
-	m_vCurrentNode = m_pGrid->GetStart();
+	m_vCurrentNode = Grid.GetStart();
 	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance = 0.0f;
-}
 
-// Async exec
-bool Dijkstra::Execute(void)
-{
-	// Get min dist node in queue
-	ComputeMinDistNodeInQueue();
-
-	if (m_vCurrentNode == m_pGrid->GetEnd() // Current is end of path
-		|| m_vCurrentNode.first == -1 // Unreachable (no more node to visit)
-		)
+	while (aQueue.size() != 0)
 	{
-		return false;
+		// Get min dist node in queue
+		ComputeMinDistNodeInQueue(aQueue);
+
+		if (m_vCurrentNode == Grid.GetEnd() // Current is end of path
+			|| m_vCurrentNode.first == -1 // Unreachable (no more node to visit)
+			)
+		{
+			break;
+		}
+
+		// Get its neihbours
+		Grid.ComputeNeighboursOfCurrent(m_vCurrentNode, bUseDiagonal, m_aNeighbours);
+
+		// Compute distance to those neighbours
+		int nNeighbours = m_aNeighbours.size();
+		for (int i = 0; i < nNeighbours; ++i)
+		{
+			const pair<int, int>& vNode = m_aNeighbours[i];
+
+			if (aQueue.end() == find(aQueue.begin(), aQueue.end(), vNode))
+				continue;
+
+			// Update dist
+			float fAdd = (vNode.first == m_vCurrentNode.first || vNode.second == m_vCurrentNode.second) ? 1.0f : sqrt(2);
+			float newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance + fAdd;
+
+			// Special case with diagonale, do not override cheapest dist
+			if (bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].fDistance)
+				continue;
+
+			m_aaWorker[vNode.first][vNode.second].fDistance = newDist;
+
+			// Update prev
+			m_aaWorker[vNode.first][vNode.second].vPrevious = m_vCurrentNode;
+
+			//m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
+		}
+
+		//m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
 	}
 
-	m_steps++;
+	// Construct and return path
+	m_aFinalPath.clear();
 
-	// Get its neihbours
-	ComputeNeighboursOfCurrent();
-
-	// Compute distance to those neighbours
-	int nNeighbours = m_aNeighbours.size();
-	for (int i = 0; i < nNeighbours; ++i)
-	{
-		const pair<int, int>& vNode = m_aNeighbours[i];
-
-		// Update dist
-		float fAdd = (vNode.first == m_vCurrentNode.first || vNode.second == m_vCurrentNode.second) ? 1.0f : sqrt(2);
-		float newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance + fAdd;
-		
-		// Special case with diagonale, do not override cheapest dist
-		if (m_bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].fDistance)
-			continue;
-		
-		m_aaWorker[vNode.first][vNode.second].fDistance = newDist;
-		
-		// Update prev
-		m_aaWorker[vNode.first][vNode.second].vPrevious = m_vCurrentNode;
-		
-		// Update text
-		char strNum[10];
-		sprintf(strNum, "%0.2f", newDist);
-		m_aTexts[vNode.first * GRID_SIZE + vNode.second].setString(strNum);
-
-		m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
-	}
-
-	m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
-
-	return true;
-}
-
-// Compute and draw final path from m_vCurrentNode to start
-void Dijkstra::Stop(void)
-{
+	m_aFinalPath.push_back(Grid.GetEnd());
 	while (m_vCurrentNode.first != -1)
 	{
-		sf::Vector2f vLocation;
-		if (m_pGrid->GetScreenCoordFromCell(m_vCurrentNode, vLocation))
-		{
-			m_aPath.push_back(sf::Vertex(vLocation, sf::Color::Magenta));
-		}
 		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
+		m_aFinalPath.push_back(m_vCurrentNode);
 	}
 
-	m_fLength = m_aPath.size() - 1; // TODO handle diagonals length
-
-	Pathfinding::Stop();
+	return m_aFinalPath;
 }
 
-void Dijkstra::DrawGui(void)
+/*
+void Dijkstra::DrawGui()
 {
 	m_bGuiOpen = false;
 
@@ -139,40 +98,17 @@ void Dijkstra::DrawGui(void)
 	}
 	ImGui::PopID();
 }
+*/
 
-void Dijkstra::Draw(sf::RenderWindow& window)
+void Dijkstra::ComputeMinDistNodeInQueue(vector<pair<int, int>> & aQueue)
 {
-	if (!m_aPath.empty())
-	{
-		window.draw(&m_aPath[0], m_aPath.size(), sf::LineStrip);
-	}
-
-	if (m_bDrawDebugTexts)
-	{
-		int nTexts = GRID_SIZE * GRID_SIZE;
-		for (int i = 0; i < nTexts; ++i)
-		{
-			window.draw(m_aTexts[i]);
-		}
-	}
-}
-
-void Dijkstra::Clear(void)
-{
-	m_aPath.clear();
-	m_bDrawDebugTexts = false;
-	m_aNodeQueue.clear();
-}
-
-void Dijkstra::ComputeMinDistNodeInQueue(void)
-{
-	int currDist = INT_MAX;
+	float currDist = UINT_MAX;
 	int id = -1;
 
-	int nNode = m_aNodeQueue.size();
+	int nNode = aQueue.size();
 	for (int i = 0; i < nNode; ++i)
 	{
-		float fNodeDist = m_aaWorker[m_aNodeQueue[i].first][m_aNodeQueue[i].second].fDistance;
+		float fNodeDist = m_aaWorker[aQueue[i].first][aQueue[i].second].fDistance;
 		if (fNodeDist < currDist)
 		{
 			id = i;
@@ -182,80 +118,11 @@ void Dijkstra::ComputeMinDistNodeInQueue(void)
 
 	if (id > -1)
 	{
-		m_vCurrentNode = m_aNodeQueue[id];
-		m_aNodeQueue.erase(m_aNodeQueue.begin() + id);
+		m_vCurrentNode = aQueue[id];
+		aQueue.erase(aQueue.begin() + id);
 	}
 	else
 	{
 		m_vCurrentNode.first = -1;
-	}
-}
-
-void Dijkstra::ComputeNeighboursOfCurrent(void)
-{
-	m_aNeighbours.clear();
-
-	pair<int, int> vTestNode = m_vCurrentNode + Utility::CellTop;
-
-	// Top
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	// Right
-	vTestNode = m_vCurrentNode + Utility::CellRight;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	// Bottom
-	vTestNode = m_vCurrentNode + Utility::CellBottom;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	// Left
-	vTestNode = m_vCurrentNode + Utility::CellLeft;
-	if (m_pGrid->IsWalkable(vTestNode) && m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-	{
-		m_aNeighbours.push_back(vTestNode);
-	}
-
-	if (m_bUseDiagonal)
-	{
-		// Top Left
-		vTestNode = m_vCurrentNode + Utility::CellTopLeft;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellTop) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellLeft)
-			&& m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-
-		// Top Right
-		vTestNode = m_vCurrentNode + Utility::CellTopRight;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellTop) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellRight)
-			&& m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-
-		// Bottom Right
-		vTestNode = m_vCurrentNode + Utility::CellBottomRight;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellBottom) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellRight)
-			&& m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
-
-		// Bottom Left
-		vTestNode = m_vCurrentNode + Utility::CellBottomLeft;
-		if (m_pGrid->IsWalkable(vTestNode) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellBottom) && m_pGrid->IsWalkable(m_vCurrentNode + Utility::CellLeft)
-			&& m_aNodeQueue.end() != find(m_aNodeQueue.begin(), m_aNodeQueue.end(), vTestNode))
-		{
-			m_aNeighbours.push_back(vTestNode);
-		}
 	}
 }

@@ -19,6 +19,10 @@ std::pair<int, int> operator+(const std::pair<int, int>& l, const std::pair<int,
 	return std::make_pair(l.first + r.first, l.second + r.second);
 }
 
+void DefaultOnDoingOperation(EOperations eOperation, const std::pair<int, int>& vCellCoord)
+{
+}
+
 // fct(a,b) : |bx - ax| + |by - ay|
 /*static*/ int Utility::GetManhattanDistance(const pair<int, int>& start, const pair<int, int>& end)
 {

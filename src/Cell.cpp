@@ -19,7 +19,7 @@ void Cell::Draw(sf::RenderWindow & window)
 	window.draw(m_shape);
 }
 
-const sf::Vector2f Cell::GetScreenCoord(void) const
+const sf::Vector2f Cell::GetScreenCoord() const
 {
 	return m_aScreenCoord;
 }
@@ -59,7 +59,7 @@ void Cell::SetState(ECellState eState, bool bForce /*= false*/)
 	m_eState = eState;
 }
 
-ECellState Cell::GetState(void) const
+ECellState Cell::GetState() const
 {
 	return m_eState;
 }

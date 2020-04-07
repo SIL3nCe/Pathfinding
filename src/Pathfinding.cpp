@@ -103,7 +103,7 @@ bool Pathfinding::UndrawAStep()
     if (m_currentStep <= 0)
         return true;
     
-    //TODO get last operation and undo it, need to know state of the cell before this op
+    //TODO Get last operation and undo it, need to know state of the cell before this op
     
     m_currentStep--;
     m_grid.SetCaseColor(m_aOperationStack[m_currentStep].vCellCoord, sf::Color::White);
@@ -166,8 +166,11 @@ void Pathfinding::DrawGUI()
 
                     if (0 == m_currentStep)
                     {
-                        //TODO draw all operations before rewinding again
-                        m_currentStep = m_aOperationStack.size();
+                        m_currentStep = 0;
+                        for (int i = 0; m_currentStep < m_aOperationStack.size();)
+                        {
+                            DrawAStep();
+                        }
                     }
                 }
             }

@@ -6,7 +6,7 @@
 using namespace std;
 
 /*TODO
-    -système de previous/next/pause pour l'affichage des opérations
+    -système de previous/next/pause pour l'affichage des opérations (à finir pour undo)
     -DrawGui des algo à faire côté pas algo
     -GridWorker en commun ? ou alors juste GetNeighbours et autres fct en commun en static dans Utility
     -path dessiné pété quand pas de solution

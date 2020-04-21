@@ -17,6 +17,7 @@ public:
 	void Draw(sf::RenderWindow & window);
 	
 	void Clear();
+	void ClearDebugInfo();
 	void Reset();
 
 	void FillGridWorker(GridWorker * pGrid);

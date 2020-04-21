@@ -51,8 +51,22 @@ void GridView::Clear()
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
+			m_aaGrid[i][j].SetState(ECellState::Empty);
+		}
+	}
+
+	m_bDrawPath = false;
+}
+
+void GridView::ClearDebugInfo()
+{
+	for (int i = 0; i < GRID_SIZE; ++i)
+	{
+		for (int j = 0; j < GRID_SIZE; ++j)
+		{
 			if (ECellState::Empty == m_aaGrid[i][j].GetState())
 			{
+				//TODO clear operations stack
 				m_aaGrid[i][j].SetColor(sf::Color::White);
 			}
 		}

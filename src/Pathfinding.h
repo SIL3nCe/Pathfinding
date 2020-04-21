@@ -12,6 +12,13 @@ enum class EPathfindingState
 	ExecAlgo,
 };
 
+enum class EAlgorithms
+{
+	AStar,
+	Dijksta,
+	BreadthFirst
+};
+
 class Pathfinding
 {
 public:
@@ -43,9 +50,17 @@ private:
 	GridView m_grid;
 
 	// Algos
+	EAlgorithms m_eSelectedAlgo;
 	Dijkstra m_algo_Dijkstra;
+	bool m_bDijkstraUseDiagonal;
+
 	BreadthFirst m_algo_BreadthFirst;
+	bool m_bBreadthFirstUseDiagonal;
+
 	AStar m_algo_AStar;
+	bool m_bAStarUseDiagonal;
+	EHeuristic m_eAStartHeuristic;
+	float m_fAStarWeight;
 
 	static std::vector<SOperation> m_aOperationStack;
 

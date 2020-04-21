@@ -3,7 +3,7 @@
 
 using namespace std;
 
-GridWorker::GridWorker(int width, int height, const std::pair<int, int>& vStart, const std::pair<int, int>& vEnd)
+GridWorker::GridWorker(int width, int height, const pair<int, int>& vStart, const pair<int, int>& vEnd)
 {
 	m_width = width;
 	m_height = height;
@@ -18,12 +18,12 @@ GridWorker::GridWorker(int width, int height, const std::pair<int, int>& vStart,
 	}
 }
 
-std::vector<std::vector<bool>>& GridWorker::GetGridToFill()
+vector<vector<bool>>& GridWorker::GetGridToFill()
 {
 	return m_aaGrid;
 }
 
-void GridWorker::ComputeNeighboursOfCurrent(const std::pair<int, int>& vCurrentNode, bool bUseDiagonal, std::vector<std::pair<int, int>>& aNeighbours) const
+void GridWorker::ComputeNeighboursOfCurrent(const pair<int, int>& vCurrentNode, bool bUseDiagonal, vector<pair<int, int>>& aNeighbours) const
 {
 	aNeighbours.clear();
 
@@ -64,35 +64,35 @@ void GridWorker::ComputeNeighboursOfCurrent(const std::pair<int, int>& vCurrentN
 	{
 		// Top Left
 		vTestNode = vCurrentNode + Utility::CellTopLeft;
-		if (IsWalkable(vTestNode) && bTopWalkable && bLeftWalkable)
+		if (IsWalkable(vTestNode) && (bTopWalkable || bLeftWalkable))
 		{
 			aNeighbours.push_back(vTestNode);
 		}
 
 		// Top Right
 		vTestNode = vCurrentNode + Utility::CellTopRight;
-		if (IsWalkable(vTestNode) && bTopWalkable && bRightWalkable)
+		if (IsWalkable(vTestNode) && (bTopWalkable || bRightWalkable))
 		{
 			aNeighbours.push_back(vTestNode);
 		}
 
 		// Bottom Right
 		vTestNode = vCurrentNode + Utility::CellBottomRight;
-		if (IsWalkable(vTestNode) && bBottomWalkable && bRightWalkable)
+		if (IsWalkable(vTestNode) && (bBottomWalkable || bRightWalkable))
 		{
 			aNeighbours.push_back(vTestNode);
 		}
 
 		// Bottom Left
 		vTestNode = vCurrentNode + Utility::CellBottomLeft;
-		if (IsWalkable(vTestNode) && bBottomWalkable && bLeftWalkable)
+		if (IsWalkable(vTestNode) && (bBottomWalkable || bLeftWalkable))
 		{
 			aNeighbours.push_back(vTestNode);
 		}
 	}
 }
 
-bool GridWorker::IsValidID(const std::pair<int, int>& vNode) const
+bool GridWorker::IsValidID(const pair<int, int>& vNode) const
 {
 	return IsValidID(vNode.first, vNode.second);
 }
@@ -102,7 +102,7 @@ inline bool GridWorker::IsValidID(int x, int y) const
 	return (x >= 0 && x < m_height && y >= 0 && y < m_width);
 }
 
-bool GridWorker::IsWalkable(const std::pair<int, int>& vNode) const
+bool GridWorker::IsWalkable(const pair<int, int>& vNode) const
 {
 	return IsWalkable(vNode.first, vNode.second);
 }

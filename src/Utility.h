@@ -2,8 +2,12 @@
 
 #include <utility>
 
-std::pair<int, int> operator+(const std::pair<int, int>& l, const std::pair<int, int>& r);
+//TODO debug only
+#include <iostream>
 
+constexpr float SquareRootOf2 = 1.41421356237309504880f;
+
+std::pair<int, int> operator+(const std::pair<int, int>& l, const std::pair<int, int>& r);
 
 enum class EOperations : unsigned int
 {

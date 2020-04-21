@@ -1,51 +1,59 @@
 #include "AStar.h"
-#include <queue>
+#include <set>
 
 using namespace std;
 
 // https://en.wikipedia.org/wiki/A*_search_algorithm
 
-vector<pair<int, int>>& AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
+void AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
 {
 	vector<vector<SDatas>> aaWorker; //TODO Find a better way
 
-	auto compare = [&](pair<int, int> & left, pair<int, int> & right)
+	auto compare = [&](const pair<int, int> & left, const pair<int, int> & right)
 	{
-		return aaWorker[left.first][left.second].heuristique > aaWorker[right.first][right.second].heuristique;
+		return aaWorker[left.first][left.second].fScore < aaWorker[right.first][right.second].fScore;
 	};
 
-	priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(compare)> aPrioQueue(compare);
-	
-	for (int i = 0; i < Grid.GetHeight(); ++i)
+	multiset<pair<int, int>, decltype(compare)> aPrioSet(compare);
+
+	int gridHeight = Grid.GetHeight();
+	int gridWidth = Grid.GetWidth();
+	for (int i = 0; i < gridHeight; ++i)
 	{
-		vector<SDatas> aLine(Grid.GetWidth());
-		for (int j = 0; j < Grid.GetWidth(); ++j)
+		vector<SDatas> aLine(gridWidth);
+		for (int j = 0; j < gridWidth; ++j)
 		{
-			SDatas datas({ false, INT_MAX, static_cast<float>(UINT_MAX), {-1, -1} });
-			aLine[j] = datas;
+			aLine[j].bClosed = false;
+			aLine[j].bQueued = false;
+			aLine[j].fHeuristic = -1.0f;
+			aLine[j].fCost = static_cast<float>(UINT_MAX - 1);
+			aLine[j].fScore = static_cast<float>(UINT_MAX - 1);
+			aLine[j].vPrevious = { -1, -1 };
 		}
 		aaWorker.push_back(aLine);
 	}
 
 	const pair<int, int>& vStart = Grid.GetStart();
-	aPrioQueue.push(vStart);
-	aaWorker[vStart.first][vStart.second].bClosed = true;
-	aaWorker[vStart.first][vStart.second].cost = 0.0f;
-	aaWorker[vStart.first][vStart.second].heuristique = ComputeHeuristic(vStart, Grid.GetEnd(), eHeuristic, fWeight);
+	aaWorker[vStart.first][vStart.second].bQueued = true;
+	aaWorker[vStart.first][vStart.second].fCost = 0.0f;
+	aaWorker[vStart.first][vStart.second].fHeuristic = ComputeHeuristic(vStart, Grid.GetEnd(), eHeuristic, fWeight);
+
+	aPrioSet.insert(vStart);
+	OnDoingOperation(EOperations::QueuedNode, vStart);
 
 	pair<int, int> vCurrentNode;
 
-	while (aPrioQueue.size() != 0)
+	while (aPrioSet.size() != 0)
 	{
-		vCurrentNode = aPrioQueue.top();
-		aPrioQueue.pop();
+		vCurrentNode = *aPrioSet.begin();
+		aPrioSet.erase(aPrioSet.begin());
 
-		if (vCurrentNode == Grid.GetEnd() // Current is end of path
-			|| vCurrentNode.first == -1 // Unreachable (no more node to visit)
-			)
-		{
+		aaWorker[vCurrentNode.first][vCurrentNode.second].bClosed = true;
+		OnDoingOperation(EOperations::ClosedNode, vCurrentNode);
+
+		// End check
+		if (vCurrentNode == Grid.GetEnd())
 			break;
-		}
 
 		// Get its neihbours
 		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
@@ -56,67 +64,42 @@ vector<pair<int, int>>& AStar::Execute(const GridWorker& Grid, bool bUseDiagonal
 		{
 			const pair<int, int>& vNode = m_aNeighbours[i];
 
-			float fAdd = (vNode.first == vCurrentNode.first || vNode.second == vCurrentNode.second) ? 1.0f : sqrt(2);
-			float newCost = aaWorker[vCurrentNode.first][vCurrentNode.second].cost + fAdd;
-
 			SDatas* pData = &aaWorker[vNode.first][vNode.second];
 
-			if (!pData->bClosed && newCost < pData->cost)
+			if (pData->bClosed)
+				continue;
+
+			float fAdd = (vNode.first == vCurrentNode.first || vNode.second == vCurrentNode.second) ? 1.0f : SquareRootOf2;
+			float newCost = aaWorker[vCurrentNode.first][vCurrentNode.second].fCost + fAdd;
+
+			if (!pData->bQueued || newCost < pData->fCost)
 			{
 				pData->vPrevious = vCurrentNode;
-				pData->cost = newCost;
-				pData->heuristique = pData->cost + ComputeHeuristic(vNode, Grid.GetEnd(), eHeuristic, fWeight);
+				pData->fCost = newCost;
+				if (!pData->bQueued)
+				{
+					pData->fHeuristic = ComputeHeuristic(vNode, Grid.GetEnd(), eHeuristic, fWeight); // Compute it only the first
+					pData->bQueued = true;
+					OnDoingOperation(EOperations::QueuedNode, vNode);
+				}
+				pData->fScore = pData->fCost + pData->fHeuristic;
 
-				aPrioQueue.push(vNode);
-				OnDoingOperation(EOperations::QueuedNode, vNode);
+				aPrioSet.insert(vNode); // Will update the key if already exists
 			}
 		}
-
-		aaWorker[vCurrentNode.first][vCurrentNode.second].bClosed = true;
-		OnDoingOperation(EOperations::ClosedNode, vCurrentNode);
 	}
 
 	// Construct and return path
-	m_aFinalPath.clear();
-	
-	m_aFinalPath.push_back(Grid.GetEnd());
-	while (vCurrentNode.first != -1)
+	aFinalPath.push_back(Grid.GetEnd());
+	while (true)
 	{
 		vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vPrevious;
-		m_aFinalPath.push_back(vCurrentNode);
+		if (vCurrentNode.first == -1)
+			break;
+
+		aFinalPath.push_back(vCurrentNode);
 	}
-
-	return m_aFinalPath;
 }
-
-/*
-void AStar::DrawGui()
-{
-	m_bGuiOpen = false;
-
-	ImGui::PushID("A*");
-	if (ImGui::CollapsingHeader("A*", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		m_bGuiOpen = true;
-
-		if (ImGui::RadioButton("Manhattan", m_eHeuristic == EHeuristics::Manhattan)) { m_eHeuristic = EHeuristics::Manhattan; }
-		if (ImGui::RadioButton("Euclidean", m_eHeuristic == EHeuristics::Euclidean)) { m_eHeuristic = EHeuristics::Euclidean; }
-		if (ImGui::RadioButton("Chebyshev", m_eHeuristic == EHeuristics::Chebyshev)) { m_eHeuristic = EHeuristics::Chebyshev; }
-		if (ImGui::RadioButton("Null (Dijkstra)", m_eHeuristic == EHeuristics::Null)) { m_eHeuristic = EHeuristics::Null; }
-	
-		ImGui::Separator();
-	
-		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
-		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
-		ImGui::InputFloat("Weight", &m_fWeight, 1.0f, 10.0f, 2, ImGuiInputTextFlags_AutoSelectAll);	
-		
-		ImGui::Separator();
-
-		ImGui::Checkbox("Heuristique value text", &m_bDrawDebugTexts);
-	}
-	ImGui::PopID();
-}
-*/
 
 float AStar::ComputeHeuristic(const pair<int, int>& start, const pair<int, int>& end, EHeuristic eHeuristic, float fWeight)
 {

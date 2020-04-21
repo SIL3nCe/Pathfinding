@@ -1,42 +1,49 @@
 #include "Dijkstra.h"
+#include <queue>
 
 using namespace std;
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
-std::vector<std::pair<int, int>>& Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal)
+void Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
 {
-	vector<pair<int, int>> aQueue;
+	vector<vector<SDatas>> aaWorker; //TODO Find a better way
+
+	auto compare = [&](pair<int, int>& left, pair<int, int>& right)
+	{
+		return aaWorker[left.first][left.second].fDistance > aaWorker[right.first][right.second].fDistance;
+	};
+
+	priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(compare)> aPrioQueue(compare);
 
 	for (int i = 0; i < Grid.GetHeight(); ++i)
 	{
 		vector<SDatas> aLine(Grid.GetWidth());
 		for (int j = 0; j < Grid.GetWidth(); ++j)
 		{
-			SDatas datas({ static_cast<float>(UINT_MAX - 1), {-1, -1} });
-			aLine.push_back(datas);
-			aQueue.push_back({ i, j });
+			aLine[j].bQueued = false;
+			aLine[j].fDistance= static_cast<float>(UINT_MAX - 1);
+			aLine[j].vPrevious = { -1, -1 };
 		}
-		m_aaWorker.push_back(aLine);
+		aaWorker.push_back(aLine);
 	}
+	
+	pair<int, int> vCurrentNode = Grid.GetStart();
+	aaWorker[vCurrentNode.first][vCurrentNode.second].fDistance = 0.0f;
 
-	m_vCurrentNode = Grid.GetStart();
-	m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance = 0.0f;
+	aPrioQueue.push(vCurrentNode);
 
-	while (aQueue.size() != 0)
+	while (aPrioQueue.size() != 0)
 	{
-		// Get min dist node in queue
-		ComputeMinDistNodeInQueue(aQueue);
+		vCurrentNode = aPrioQueue.top();
+		aPrioQueue.pop();
 
-		if (m_vCurrentNode == Grid.GetEnd() // Current is end of path
-			|| m_vCurrentNode.first == -1 // Unreachable (no more node to visit)
-			)
-		{
+		// End check
+		if (vCurrentNode == Grid.GetEnd())
 			break;
-		}
 
 		// Get its neihbours
-		Grid.ComputeNeighboursOfCurrent(m_vCurrentNode, bUseDiagonal, m_aNeighbours);
+		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
 
 		// Compute distance to those neighbours
 		int nNeighbours = m_aNeighbours.size();
@@ -44,85 +51,41 @@ std::vector<std::pair<int, int>>& Dijkstra::Execute(const GridWorker& Grid, bool
 		{
 			const pair<int, int>& vNode = m_aNeighbours[i];
 
-			if (aQueue.end() == find(aQueue.begin(), aQueue.end(), vNode))
+			if (aaWorker[vNode.first][vNode.second].bQueued)
 				continue;
 
 			// Update dist
-			float fAdd = (vNode.first == m_vCurrentNode.first || vNode.second == m_vCurrentNode.second) ? 1.0f : sqrt(2);
-			float newDist = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].fDistance + fAdd;
+			float fAdd = (vNode.first == vCurrentNode.first || vNode.second == vCurrentNode.second) ? 1.0f : SquareRootOf2;
+			float newDist = aaWorker[vCurrentNode.first][vCurrentNode.second].fDistance + fAdd;
 
 			// Special case with diagonale, do not override cheapest dist
-			if (bUseDiagonal && newDist > m_aaWorker[vNode.first][vNode.second].fDistance)
+			if (bUseDiagonal && newDist > aaWorker[vNode.first][vNode.second].fDistance)
 				continue;
 
-			m_aaWorker[vNode.first][vNode.second].fDistance = newDist;
+			if (newDist < aaWorker[vNode.first][vNode.second].fDistance)
+			{
+				aaWorker[vNode.first][vNode.second].fDistance = newDist;
+				aaWorker[vNode.first][vNode.second].vPrevious = vCurrentNode;
+				aaWorker[vNode.first][vNode.second].bQueued = true;
 
-			// Update prev
-			m_aaWorker[vNode.first][vNode.second].vPrevious = m_vCurrentNode;
-
-			//m_pGrid->SetCaseColor(vNode, sf::Color::Yellow);
+				aPrioQueue.push(vNode);
+				OnDoingOperation(EOperations::QueuedNode, vNode);
+			}
 		}
 
-		//m_pGrid->SetCaseColor(m_vCurrentNode, sf::Color::Cyan);
+		OnDoingOperation(EOperations::ClosedNode, vCurrentNode);
 	}
 
 	// Construct and return path
-	m_aFinalPath.clear();
+	aFinalPath.clear();
 
-	m_aFinalPath.push_back(Grid.GetEnd());
-	while (m_vCurrentNode.first != -1)
+	aFinalPath.push_back(Grid.GetEnd());
+	while (true)
 	{
-		m_vCurrentNode = m_aaWorker[m_vCurrentNode.first][m_vCurrentNode.second].vPrevious;
-		m_aFinalPath.push_back(m_vCurrentNode);
-	}
+		vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vPrevious;
+		if (vCurrentNode.first == -1)
+			break;
 
-	return m_aFinalPath;
-}
-
-/*
-void Dijkstra::DrawGui()
-{
-	m_bGuiOpen = false;
-
-	ImGui::PushID("Dijkstra");
-	if (ImGui::CollapsingHeader("Dijkstra"))
-	{
-		m_bGuiOpen = true;
-
-		ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
-		ImGui::Checkbox("Bidirectional", &m_bBidirectional);
-
-		ImGui::Separator();
-
-		ImGui::Checkbox("Distances text", &m_bDrawDebugTexts);
-	}
-	ImGui::PopID();
-}
-*/
-
-void Dijkstra::ComputeMinDistNodeInQueue(vector<pair<int, int>> & aQueue)
-{
-	float currDist = UINT_MAX;
-	int id = -1;
-
-	int nNode = aQueue.size();
-	for (int i = 0; i < nNode; ++i)
-	{
-		float fNodeDist = m_aaWorker[aQueue[i].first][aQueue[i].second].fDistance;
-		if (fNodeDist < currDist)
-		{
-			id = i;
-			currDist = fNodeDist;
-		}
-	}
-
-	if (id > -1)
-	{
-		m_vCurrentNode = aQueue[id];
-		aQueue.erase(aQueue.begin() + id);
-	}
-	else
-	{
-		m_vCurrentNode.first = -1;
+		aFinalPath.push_back(vCurrentNode);
 	}
 }

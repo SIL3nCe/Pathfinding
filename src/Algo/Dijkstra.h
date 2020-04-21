@@ -1,27 +1,20 @@
 #pragma once
 
 #include "../GridWorker.h"
+#include "../Utility.h"
 
 class Dijkstra
 {
 public:
-	std::vector<std::pair<int, int>>& Execute(const GridWorker& Grid, bool bUseDiagonal);
-
-private:
-	void ComputeMinDistNodeInQueue(std::vector<std::pair<int, int>>& aQueue);
+	void Execute(const GridWorker& Grid, bool bUseDiagonal, std::vector<std::pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const std::pair<int, int>&) = DefaultOnDoingOperation);
 
 private:
 	struct SDatas
 	{
+		bool bQueued;
 		float fDistance;
 		std::pair<int, int> vPrevious;
 	};
 
-	std::vector<std::vector<SDatas>> m_aaWorker;
-
 	std::vector<std::pair<int, int>> m_aNeighbours;
-
-	std::vector<std::pair<int, int>> m_aFinalPath;
-
-	std::pair<int, int> m_vCurrentNode;
 };

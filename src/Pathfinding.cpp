@@ -9,14 +9,20 @@ std::vector<SOperation> Pathfinding::m_aOperationStack;
 Pathfinding::Pathfinding()
 : m_eState(EPathfindingState::GridUse)
 , m_grid()
+, m_eSelectedAlgo(EAlgorithms::AStar)
 , m_algo_Dijkstra()
+, m_bDijkstraUseDiagonal(true)
 , m_algo_BreadthFirst()
+, m_bBreadthFirstUseDiagonal(true)
 , m_algo_AStar()
+, m_bAStarUseDiagonal(true)
+, m_eAStartHeuristic(EHeuristic::Manhattan)
+, m_fAStarWeight(1.0f)
 , m_currentStep(0)
 , m_bRewind(false)
 , m_bPause(true)
 , m_frameBeforeDrawing(1)
-, m_operationsToDrawPerFrames(1)
+, m_operationsToDrawPerFrames(4)
 , m_frameCounter(0)
 , m_fTime(0.0f)
 , m_steps(0)
@@ -64,7 +70,15 @@ void Pathfinding::Update(float dt)
 
             GridWorker gridWorker(GRID_SIZE, GRID_SIZE, m_grid.GetStart(), m_grid.GetEnd());
             m_grid.FillGridWorker(&gridWorker);
-            vector<pair<int, int>>& aPath = m_algo_AStar.Execute(gridWorker, true, EHeuristic::Manhattan, 1.0f, Pathfinding::OnDoingOperation);
+            vector<pair<int, int>> aPath;
+
+            switch (m_eSelectedAlgo)
+            {
+                case EAlgorithms::AStar: m_algo_AStar.Execute(gridWorker, m_bAStarUseDiagonal, m_eAStartHeuristic, m_fAStarWeight, aPath, Pathfinding::OnDoingOperation); break;
+                case EAlgorithms::Dijksta: m_algo_Dijkstra.Execute(gridWorker, m_bDijkstraUseDiagonal, aPath, Pathfinding::OnDoingOperation); break;
+                case EAlgorithms::BreadthFirst: m_algo_BreadthFirst.Execute(gridWorker, m_bBreadthFirstUseDiagonal, aPath, Pathfinding::OnDoingOperation); break;
+            }
+
             m_grid.DrawPath(aPath);
 
             //Compute stats
@@ -131,18 +145,99 @@ void Pathfinding::DrawGUI()
             sprintf(buf, "%d", m_steps);
             ImGui::LabelText(buf, "Steps: ");
         }
-
-        ImGui::End();
     }
+    ImGui::End();
 
     if (ImGui::Begin("Algorithmes"))
     {
-        //for (Pathfinding* pAlgo : aAlgo)
-        //{
-        //    pAlgo->DrawGui();
-        //}
-        ImGui::End();
+        if (EAlgorithms::AStar == m_eSelectedAlgo)
+        {
+            ImGui::SetNextTreeNodeOpen(true);
+            if (ImGui::CollapsingHeader("A*"))
+            {
+                if (ImGui::RadioButton("Manhattan", m_eAStartHeuristic == EHeuristic::Manhattan))
+                    m_eAStartHeuristic = EHeuristic::Manhattan;
+                if (ImGui::RadioButton("Euclidean", m_eAStartHeuristic == EHeuristic::Euclidean))
+                    m_eAStartHeuristic = EHeuristic::Euclidean;
+                if (ImGui::RadioButton("Chebyshev", m_eAStartHeuristic == EHeuristic::Chebyshev))
+                    m_eAStartHeuristic = EHeuristic::Chebyshev;
+
+                ImGui::Checkbox("Use Diagonal", &m_bAStarUseDiagonal);
+                ImGui::InputFloat("Weight", &m_fAStarWeight);
+            }
+        }
+        else
+        {
+            ImGui::SetNextTreeNodeOpen(false);
+            if (ImGui::CollapsingHeader("A*", ImGuiTreeNodeFlags_Bullet))
+            {
+                m_eSelectedAlgo = EAlgorithms::AStar;
+            }
+        }
+
+        if (EAlgorithms::Dijksta == m_eSelectedAlgo)
+        {
+            ImGui::SetNextTreeNodeOpen(true);
+            if (ImGui::CollapsingHeader("Dijkstra"))
+            {
+                ImGui::Checkbox("Use Diagonal", &m_bDijkstraUseDiagonal);
+            }
+        }
+        else
+        {
+            ImGui::SetNextTreeNodeOpen(false);
+            if (ImGui::CollapsingHeader("Dijkstra", ImGuiTreeNodeFlags_Bullet))
+            {
+                m_eSelectedAlgo = EAlgorithms::Dijksta;
+            }
+        }
+        
+        if (EAlgorithms::BreadthFirst == m_eSelectedAlgo)
+        {
+            ImGui::SetNextTreeNodeOpen(true);
+            if (ImGui::CollapsingHeader("Breadth First"))
+            {
+                ImGui::Checkbox("Use Diagonal", &m_bBreadthFirstUseDiagonal);
+            }
+        }
+        else
+        {
+            ImGui::SetNextTreeNodeOpen(false);
+            if (ImGui::CollapsingHeader("Breadth First", ImGuiTreeNodeFlags_Bullet))
+            {
+                m_eSelectedAlgo = EAlgorithms::BreadthFirst;
+            }
+        }
     }
+    ImGui::End();
+
+    if (ImGui::Begin("Actions"))
+    {
+        if (ImGui::Button("Execute"))
+        {
+            if (m_eState == EPathfindingState::GridUse)
+            {
+                SetState(EPathfindingState::ExecAlgo);
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Clear"))
+        {
+            if (m_eState == EPathfindingState::GridUse)
+            {
+                m_grid.Clear();
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset"))
+        {
+            if (m_eState == EPathfindingState::GridUse)
+            {
+                m_grid.Reset();
+            }
+        }
+    }
+    ImGui::End();
 
     // Global options
     if (ImGui::Begin("Debug draw"))
@@ -219,8 +314,8 @@ void Pathfinding::DrawGUI()
 
         ImGui::SliderInt("Frames between operations", &m_frameBeforeDrawing, 1, 10);
         ImGui::SliderInt("Operations per draw", &m_operationsToDrawPerFrames, 1, 20);
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void Pathfinding::SetState(EPathfindingState eNewState)
@@ -230,7 +325,7 @@ void Pathfinding::SetState(EPathfindingState eNewState)
     {
         case EPathfindingState::GridUse:
         {
-            m_grid.Clear();
+            m_grid.ClearDebugInfo();
             m_aOperationStack.clear();
         }
         break;

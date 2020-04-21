@@ -1,12 +1,13 @@
 #pragma once
 
 #include "../GridWorker.h"
+#include "../Utility.h"
 #include <queue>
 
 class BreadthFirst
 {
 public:
-	std::vector<std::pair<int, int>>& Execute(const GridWorker& Grid, bool bUseDiagonal);
+	void Execute(const GridWorker& Grid, bool bUseDiagonal, std::vector<std::pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const std::pair<int, int>&) = DefaultOnDoingOperation);
 
 private:
 	struct SDatas
@@ -15,11 +16,5 @@ private:
 		std::pair<int, int> vParent;
 	};
 
-	std::vector<std::vector<SDatas>> m_aaWorker;
-
 	std::vector<std::pair<int, int>> m_aNeighbours;
-
-	std::vector<std::pair<int, int>> m_aFinalPath;
-
-	std::pair<int, int> m_vCurrentNode;
 };

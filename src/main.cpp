@@ -7,11 +7,15 @@ using namespace std;
 
 /*TODO
     -système de previous/next/pause pour l'affichage des opérations (à finir pour undo)
-    -DrawGui des algo à faire côté pas algo
     -GridWorker en commun ? ou alors juste GetNeighbours et autres fct en commun en static dans Utility
     -path dessiné pété quand pas de solution
-    -draw path after at operation stack end ? (en option, "show pass at debug end")
+    -draw path afteranimation end ? (en option, "show pass at debug end")
     -nbr de cases dynamique ?
+    -Gui Actions: faire boutons plus gros
+
+*ALGOs
+    -Gérer bidirectionnel
+    -Implem plus d'algo
 */
 
 int main()
@@ -85,6 +89,8 @@ int main()
         pathfinding.Update(dt);
 
         window.clear();
+
+        //ImGui::ShowDemoWindow();
 
         pathfinding.Draw(window);
 

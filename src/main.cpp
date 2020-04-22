@@ -7,12 +7,9 @@ using namespace std;
 
 /*TODO
     -système de previous/next/pause pour l'affichage des opérations (à finir pour undo)
-    -GridWorker en commun ? ou alors juste GetNeighbours et autres fct en commun en static dans Utility
-    -path dessiné pété quand pas de solution
-    -draw path afteranimation end ? (en option, "show pass at debug end")
-    -nbr de cases dynamique ?
-    -Gui Actions: faire boutons plus gros
-
+    -nbr de cases dynamique
+    -Comparaison des stats en lançant plusieurs algo en même temps
+        
 *ALGOs
     -Gérer bidirectionnel
     -Implem plus d'algo

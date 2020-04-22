@@ -5,7 +5,7 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
-void Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
+bool Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
 {
 	vector<vector<SDatas>> aaWorker; //TODO Find a better way
 
@@ -40,7 +40,17 @@ void Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<in
 
 		// End check
 		if (vCurrentNode == Grid.GetEnd())
-			break;
+		{
+			aFinalPath.clear();
+
+			while (vCurrentNode.first != -1)
+			{
+				aFinalPath.push_back(vCurrentNode);
+				vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vPrevious;
+			}
+
+			return true;
+		}
 
 		// Get its neihbours
 		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
@@ -76,16 +86,5 @@ void Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<in
 		OnDoingOperation(EOperations::ClosedNode, vCurrentNode);
 	}
 
-	// Construct and return path
-	aFinalPath.clear();
-
-	aFinalPath.push_back(Grid.GetEnd());
-	while (true)
-	{
-		vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vPrevious;
-		if (vCurrentNode.first == -1)
-			break;
-
-		aFinalPath.push_back(vCurrentNode);
-	}
+	return false;
 }

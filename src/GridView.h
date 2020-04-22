@@ -24,7 +24,7 @@ public:
 
 	void SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color);
 
-	void DrawPath(const std::vector<std::pair<int, int>>& aPath);
+	float DrawPath(const std::vector<std::pair<int, int>>& aPath);
 	void SetDrawPath(bool bDraw);
 
 	void DrawOperation(const SOperation& operation);
@@ -36,11 +36,7 @@ public:
 	bool GetScreenCoordFromCell(int x, int y, sf::Vector2f& vLocation) const;
 	bool GetScreenCoordFromCell(const std::pair<int, int>& vNode, sf::Vector2f& vLocation) const;
 
-	bool IsValidID(const std::pair<int, int>& vNode) const;
 	inline bool IsValidID(int x, int y) const;
-
-	bool IsWalkable(const std::pair<int, int>& vNode) const;
-	inline bool IsWalkable(int x, int y) const;
 
 	const std::pair<int, int>& GetStart() const { return m_vStart; }
 	const std::pair<int, int>& GetEnd() const { return m_vEnd; }

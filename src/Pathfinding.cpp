@@ -79,13 +79,12 @@ void Pathfinding::Update(float dt)
                 case EAlgorithms::BreadthFirst: m_algo_BreadthFirst.Execute(gridWorker, m_bBreadthFirstUseDiagonal, aPath, Pathfinding::OnDoingOperation); break;
             }
 
-            m_grid.DrawPath(aPath);
+            m_fLength = m_grid.DrawPath(aPath);
 
             //Compute stats
             m_fTime = m_algoClock.getElapsedTime().asSeconds();
             m_fTime *= 1000.0f;
             m_steps = m_aOperationStack.size();
-            m_fLength = aPath.size() - 1; // TODO handle diagonales (do it during drawpath ?)
 
             SetState(EPathfindingState::GridUse);
         }
@@ -150,6 +149,7 @@ void Pathfinding::DrawGUI()
 
     if (ImGui::Begin("Algorithmes"))
     {
+        ImGui::PushItemWidth(100.0f);
         if (EAlgorithms::AStar == m_eSelectedAlgo)
         {
             ImGui::SetNextTreeNodeOpen(true);
@@ -213,15 +213,23 @@ void Pathfinding::DrawGUI()
 
     if (ImGui::Begin("Actions"))
     {
-        if (ImGui::Button("Execute"))
+        if (ImGui::Button("Execute", sf::Vector2f(60.0f, 30.0f)))
         {
             if (m_eState == EPathfindingState::GridUse)
             {
                 SetState(EPathfindingState::ExecAlgo);
             }
         }
+        ImGui::SameLine();        
+        if (ImGui::Button("Execute All", sf::Vector2f(85.0f, 30.0f)))
+        {
+            if (m_eState == EPathfindingState::GridUse)
+            {
+                //TODO
+            }
+        }
         ImGui::SameLine();
-        if (ImGui::Button("Clear"))
+        if (ImGui::Button("Clear", sf::Vector2f(60.0f, 30.0f)))
         {
             if (m_eState == EPathfindingState::GridUse)
             {
@@ -229,11 +237,12 @@ void Pathfinding::DrawGUI()
             }
         }
         ImGui::SameLine();
-        if (ImGui::Button("Reset"))
+        if (ImGui::Button("Reset", sf::Vector2f(60.0f, 30.0f)))
         {
             if (m_eState == EPathfindingState::GridUse)
             {
                 m_grid.Reset();
+                //TODO + reset every values, stats, options, etc
             }
         }
     }
@@ -242,6 +251,8 @@ void Pathfinding::DrawGUI()
     // Global options
     if (ImGui::Begin("Debug draw"))
     {
+        ImGui::PushItemWidth(100.0f);
+
         if (ImGui::ImageButton(buttonPrevious, sf::Vector2f(30.0f, 30.0f)))
         {
             m_bPause = true;
@@ -290,7 +301,7 @@ void Pathfinding::DrawGUI()
 
                     if (m_currentStep >= m_aOperationStack.size())
                     {
-                        m_grid.Clear();
+                        m_grid.ClearDebugInfo();
                         m_currentStep = 0;
                     }
                 }

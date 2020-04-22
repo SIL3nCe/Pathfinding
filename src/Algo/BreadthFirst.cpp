@@ -4,7 +4,7 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 
-void BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
+bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
 {
 	vector<vector<SDatas>> aaWorker;
 
@@ -34,7 +34,16 @@ void BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pai
 
 		// Current is end of path
 		if (vCurrentNode == Grid.GetEnd())
-			break;
+		{
+			aFinalPath.clear();
+			while (vCurrentNode.first != -1)
+			{
+				aFinalPath.push_back(vCurrentNode);
+				vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vParent;
+			}
+
+			return true;
+		}
 
 		// Get its neihbours
 		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
@@ -59,16 +68,5 @@ void BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pai
 		OnDoingOperation(EOperations::ClosedNode, vCurrentNode);
 	}
 
-	// Construct and return path
-	aFinalPath.clear();
-
-	aFinalPath.push_back(Grid.GetEnd());
-	while (true)
-	{
-		vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vParent;
-		if (vCurrentNode.first == -1)
-			break;
-
-		aFinalPath.push_back(vCurrentNode);
-	}
+	return false;
 }

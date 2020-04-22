@@ -120,8 +120,9 @@ void GridView::SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& c
 	m_aaGrid[vCase.first][vCase.second].SetColor(color);
 }
 
-void GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
+float GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
 {
+	float fLength = 0.0f;
 	m_aPath.clear();
 
 	int nNodes = aPath.size();
@@ -132,9 +133,16 @@ void GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
 		{
 			m_aPath.push_back(sf::Vertex(vLocation, sf::Color::Magenta));
 		}
+
+		if (i > 0)
+		{
+			fLength += (aPath[i].first == aPath[i - 1].first || aPath[i].second == aPath[i - 1].second) ? 1.0f : SquareRootOf2;
+		}
 	}
 
 	m_bDrawPath = true;
+	
+	return fLength;
 }
 
 void GridView::SetDrawPath(bool bDraw)
@@ -230,22 +238,7 @@ bool GridView::GetScreenCoordFromCell(const std::pair<int, int>& vNode, sf::Vect
 	return GetScreenCoordFromCell(vNode.first, vNode.second, vLocation);
 }
 
-bool GridView::IsValidID(const std::pair<int, int>& vNode) const
-{
-	return IsValidID(vNode.first, vNode.second);
-}
-
 inline bool GridView::IsValidID(int x, int y) const
 {
 	return (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE);
-}
-
-bool GridView::IsWalkable(const std::pair<int, int>& vNode) const
-{
-	return IsWalkable(vNode.first, vNode.second);
-}
-
-inline bool GridView::IsWalkable(int x, int y) const
-{
-	return IsValidID(x, y) && m_aaGrid[x][y].GetState() != ECellState::Wall;
 }

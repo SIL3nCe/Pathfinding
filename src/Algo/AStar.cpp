@@ -5,7 +5,7 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/A*_search_algorithm
 
-void AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
+bool AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
 {
 	vector<vector<SDatas>> aaWorker; //TODO Find a better way
 
@@ -53,7 +53,16 @@ void AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuri
 
 		// End check
 		if (vCurrentNode == Grid.GetEnd())
-			break;
+		{
+			aFinalPath.clear();
+			while (vCurrentNode.first != -1)
+			{
+				aFinalPath.push_back(vCurrentNode);
+				vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vPrevious;
+			}
+
+			return true;
+		}
 
 		// Get its neihbours
 		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
@@ -89,16 +98,7 @@ void AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuri
 		}
 	}
 
-	// Construct and return path
-	aFinalPath.push_back(Grid.GetEnd());
-	while (true)
-	{
-		vCurrentNode = aaWorker[vCurrentNode.first][vCurrentNode.second].vPrevious;
-		if (vCurrentNode.first == -1)
-			break;
-
-		aFinalPath.push_back(vCurrentNode);
-	}
+	return false;
 }
 
 float AStar::ComputeHeuristic(const pair<int, int>& start, const pair<int, int>& end, EHeuristic eHeuristic, float fWeight)

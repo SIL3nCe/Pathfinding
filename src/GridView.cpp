@@ -64,10 +64,9 @@ void GridView::ClearDebugInfo()
 	{
 		for (int j = 0; j < GRID_SIZE; ++j)
 		{
-			if (ECellState::Empty == m_aaGrid[i][j].GetState())
+			if (ECellState::Wall != m_aaGrid[i][j].GetState())
 			{
-				//TODO clear operations stack
-				m_aaGrid[i][j].SetColor(sf::Color::White);
+				m_aaGrid[i][j].ClearDebugInfo();
 			}
 		}
 	}
@@ -111,15 +110,6 @@ void GridView::FillGridWorker(GridWorker * grid)
 	}
 }
 
-// Used to mark treated cases during alogirthms execution
-void GridView::SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color)
-{
-	if (vCase == m_vStart || vCase == m_vEnd)
-		return;
-
-	m_aaGrid[vCase.first][vCase.second].SetColor(color);
-}
-
 float GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
 {
 	float fLength = 0.0f;
@@ -150,22 +140,20 @@ void GridView::SetDrawPath(bool bDraw)
 	m_bDrawPath = bDraw;
 }
 
-void GridView::DrawOperation(const SOperation& operation)
+void GridView::DoOperation(const SOperation& operation)
 {
-	switch (operation.eOperation)
-	{
-		case EOperations::QueuedNode:
-		{
-			SetCaseColor(operation.vCellCoord, sf::Color::Yellow);
-		}
-		break;
+	if (!IsValidID(operation.vCellCoord.first, operation.vCellCoord.second))
+		return;
 
-		case EOperations::ClosedNode:
-		{
-			SetCaseColor(operation.vCellCoord, sf::Color::Cyan);
-		}
-		break;
-	}
+	m_aaGrid[operation.vCellCoord.first][operation.vCellCoord.second].DoOperation(operation.eOperation);
+}
+
+void GridView::UndoOperation(const SOperation& operation)
+{
+	if (!IsValidID(operation.vCellCoord.first, operation.vCellCoord.second))
+		return;
+
+	m_aaGrid[operation.vCellCoord.first][operation.vCellCoord.second].UndoOperation();
 }
 
 void GridView::OnMouseClicked(int posX, int posY)

@@ -105,7 +105,7 @@ bool Pathfinding::DrawAStep()
     if (m_currentStep >= m_aOperationStack.size())
         return true;
 
-    m_grid.DrawOperation(m_aOperationStack[m_currentStep]);
+    m_grid.DoOperation(m_aOperationStack[m_currentStep]);
     m_currentStep++;
 
     return false;
@@ -116,16 +116,15 @@ bool Pathfinding::UndrawAStep()
     if (m_currentStep <= 0)
         return true;
     
-    //TODO Get last operation and undo it, need to know state of the cell before this op
-    
     m_currentStep--;
-    m_grid.SetCaseColor(m_aOperationStack[m_currentStep].vCellCoord, sf::Color::White);
+    m_grid.UndoOperation(m_aOperationStack[m_currentStep]);
 
     return false;
 }
 
 void Pathfinding::DrawGUI()
 {
+    //
     //Statistics
     if (ImGui::Begin("Stats"))
     {
@@ -147,7 +146,9 @@ void Pathfinding::DrawGUI()
     }
     ImGui::End();
 
-    if (ImGui::Begin("Algorithmes"))
+    //
+    // Algorithms
+    if (ImGui::Begin("Algorithms"))
     {
         ImGui::PushItemWidth(100.0f);
         if (EAlgorithms::AStar == m_eSelectedAlgo)
@@ -211,6 +212,8 @@ void Pathfinding::DrawGUI()
     }
     ImGui::End();
 
+    //
+    // Actions buttons
     if (ImGui::Begin("Actions"))
     {
         if (ImGui::Button("Execute", sf::Vector2f(60.0f, 30.0f)))
@@ -248,7 +251,8 @@ void Pathfinding::DrawGUI()
     }
     ImGui::End();
 
-    // Global options
+    //
+    // Animation options
     if (ImGui::Begin("Debug draw"))
     {
         ImGui::PushItemWidth(100.0f);
@@ -321,6 +325,20 @@ void Pathfinding::DrawGUI()
             m_bPause = true;
             m_bRewind = false;
             DrawAStep();
+        }
+
+        ImGui::Text("Last drawn operation: ");
+        ImGui::SameLine();
+        if (m_currentStep <= m_aOperationStack.size() && m_currentStep > 0)
+        {
+            char buf[64];
+            const SOperation& operation = m_aOperationStack[m_currentStep - 1];
+            sprintf(buf, "(%d,%d) - %s", operation.vCellCoord.first, operation.vCellCoord.second, operation.eOperation == EOperations::QueuedNode ? "Queued" : "Closed");
+            ImGui::Text(buf);
+        }
+        else
+        {
+            ImGui::Text("-");
         }
 
         ImGui::SliderInt("Frames between operations", &m_frameBeforeDrawing, 1, 10);

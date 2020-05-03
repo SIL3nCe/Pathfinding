@@ -6,10 +6,10 @@
 using namespace std;
 
 /*TODO
-    -système de previous/next/pause pour l'affichage des opérations (à finir pour undo)
     -nbr de cases dynamique
     -Comparaison des stats en lançant plusieurs algo en même temps
-        
+    -Trouver autre solution plus opti pour le gridworker
+
 *ALGOs
     -Gérer bidirectionnel
     -Implem plus d'algo

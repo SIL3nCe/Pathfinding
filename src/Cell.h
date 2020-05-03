@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Utility.h"
+#include <stack>
 
 enum class ECellState
 {
@@ -22,7 +24,13 @@ public:
 	void SetState(ECellState eState, bool bForce = false);
 	ECellState GetState() const;
 
-	void SetColor(const sf::Color& color);
+	void ClearDebugInfo();
+
+	void DoOperation(EOperations eOperation);
+	void UndoOperation();
+
+private:
+	void ApplyOperation();
 
 private:
 	sf::RectangleShape m_shape;
@@ -30,4 +38,6 @@ private:
 	sf::Vector2f m_aScreenCoord;
 
 	ECellState m_eState;
+
+	std::stack<EOperations> m_aOperations;
 };

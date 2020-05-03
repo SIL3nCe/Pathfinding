@@ -22,12 +22,11 @@ public:
 
 	void FillGridWorker(GridWorker * pGrid);
 
-	void SetCaseColor(const std::pair<int, int>& vCase, const sf::Color& color);
-
 	float DrawPath(const std::vector<std::pair<int, int>>& aPath);
 	void SetDrawPath(bool bDraw);
 
-	void DrawOperation(const SOperation& operation);
+	void DoOperation(const SOperation& operation);
+	void UndoOperation(const SOperation& operation);
 
 	void OnMouseClicked(int posX, int posY);
 	void OnMouseMoved(int posX, int posY);

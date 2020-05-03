@@ -57,6 +57,7 @@ void Cell::SetState(ECellState eState, bool bForce /*= false*/)
 	}
 
 	m_eState = eState;
+	m_aOperations = {};
 }
 
 ECellState Cell::GetState() const
@@ -64,7 +65,48 @@ ECellState Cell::GetState() const
 	return m_eState;
 }
 
-void Cell::SetColor(const sf::Color& color)
+void Cell::ClearDebugInfo()
 {
-	m_shape.setFillColor(color);
+	m_aOperations = {};
+	ApplyOperation();
+}
+
+void Cell::DoOperation(EOperations eOperation)
+{
+	m_aOperations.emplace(eOperation);
+	ApplyOperation();
+}
+
+void Cell::UndoOperation()
+{
+	m_aOperations.pop();
+	ApplyOperation();
+}
+
+void Cell::ApplyOperation()
+{
+	// Draw debug operations on empty cells only
+	if (m_eState != ECellState::Empty)
+		return;
+	
+	if (m_aOperations.empty())
+	{
+		m_shape.setFillColor(sf::Color::White);
+		return;
+	}
+
+	switch (m_aOperations.top())
+	{
+		case EOperations::QueuedNode:
+		{
+			m_shape.setFillColor(sf::Color::Yellow);
+		}
+		break;
+
+		case EOperations::ClosedNode:
+		{
+			m_shape.setFillColor(sf::Color::Cyan);
+		}
+		break;
+	}
 }

@@ -7,32 +7,26 @@ using namespace std;
 
 bool AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, vector<pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /*= DefaultOnDoingOperation*/)
 {
-	vector<vector<SDatas>> aaWorker; //TODO Find a better way
-
-	auto compare = [&](const pair<int, int> & left, const pair<int, int> & right)
-	{
-		return aaWorker[left.first][left.second].fScore < aaWorker[right.first][right.second].fScore;
-	};
-
-	multiset<pair<int, int>, decltype(compare)> aPrioSet(compare);
+	// Init worker
+	vector<vector<SDatas>> aaWorker;
 
 	int gridHeight = Grid.GetHeight();
 	int gridWidth = Grid.GetWidth();
 	for (int i = 0; i < gridHeight; ++i)
 	{
 		vector<SDatas> aLine(gridWidth);
-		for (int j = 0; j < gridWidth; ++j)
-		{
-			aLine[j].bClosed = false;
-			aLine[j].bQueued = false;
-			aLine[j].fHeuristic = -1.0f;
-			aLine[j].fCost = static_cast<float>(UINT_MAX - 1);
-			aLine[j].fScore = static_cast<float>(UINT_MAX - 1);
-			aLine[j].vPrevious = { -1, -1 };
-		}
 		aaWorker.push_back(aLine);
 	}
 
+	// Init multiset
+	auto compare = [&aaWorker](const pair<int, int> & left, const pair<int, int> & right)
+	{
+		return aaWorker[left.first][left.second].fScore < aaWorker[right.first][right.second].fScore;
+	};
+
+	multiset<pair<int, int>, decltype(compare)> aPrioSet(compare);
+
+	// Setup start node
 	const pair<int, int>& vStart = Grid.GetStart();
 	aaWorker[vStart.first][vStart.second].bQueued = true;
 	aaWorker[vStart.first][vStart.second].fCost = 0.0f;
@@ -64,7 +58,7 @@ bool AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuri
 			return true;
 		}
 
-		// Get its neihbours
+		// Get neighbours
 		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
 
 		// Compute distance to those neighbours

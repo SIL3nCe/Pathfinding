@@ -11,9 +11,9 @@ public:
 private:
 	struct SDatas
 	{
-		bool bQueued;
-		float fDistance;
-		std::pair<int, int> vPrevious;
+		bool bQueued = false;
+		float fDistance = static_cast<float>(UINT_MAX - 1);
+		std::pair<int, int> vPrevious = { -1, -1 };
 	};
 
 	std::vector<std::pair<int, int>> m_aNeighbours;

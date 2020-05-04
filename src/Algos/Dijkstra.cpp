@@ -7,8 +7,18 @@ using namespace std;
 
 bool Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /*= DefaultOnDoingOperation*/)
 {
-	vector<vector<SDatas>> aaWorker; //TODO Find a better way
+	// Init worker
+	vector<vector<SDatas>> aaWorker;
 
+	int gridHeight = Grid.GetHeight();
+	int gridWidth = Grid.GetWidth();
+	for (int i = 0; i < gridHeight; ++i)
+	{
+		vector<SDatas> aLine(gridWidth);
+		aaWorker.push_back(aLine);
+	}
+
+	// Init priority queue
 	auto compare = [&](pair<int, int>& left, pair<int, int>& right)
 	{
 		return aaWorker[left.first][left.second].fDistance > aaWorker[right.first][right.second].fDistance;
@@ -16,22 +26,12 @@ bool Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<in
 
 	priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(compare)> aPrioQueue(compare);
 
-	for (int i = 0; i < Grid.GetHeight(); ++i)
-	{
-		vector<SDatas> aLine(Grid.GetWidth());
-		for (int j = 0; j < Grid.GetWidth(); ++j)
-		{
-			aLine[j].bQueued = false;
-			aLine[j].fDistance= static_cast<float>(UINT_MAX - 1);
-			aLine[j].vPrevious = { -1, -1 };
-		}
-		aaWorker.push_back(aLine);
-	}
-	
-	pair<int, int> vCurrentNode = Grid.GetStart();
-	aaWorker[vCurrentNode.first][vCurrentNode.second].fDistance = 0.0f;
+	// Setup start node	
+	const pair<int, int>& vStart = Grid.GetStart();
+	aaWorker[vStart.first][vStart.second].fDistance = 0.0f;
+	aPrioQueue.push(vStart);
 
-	aPrioQueue.push(vCurrentNode);
+	pair<int, int> vCurrentNode;
 
 	while (aPrioQueue.size() != 0)
 	{

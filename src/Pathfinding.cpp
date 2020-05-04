@@ -93,6 +93,7 @@ void Pathfinding::Update(float dt)
             int i = 0;
             for (AlgoView* pAlgo : m_aAlgoViews)
             {
+                //TODO give a OnDoingOperationFctPtr which will only count operations for stats
                 pAlgo->Execute(gridWorker, aPath, i == static_cast<int>(m_eSelectedAlgo) ? Pathfinding::OnDoingOperation : DefaultOnDoingOperation);
 
                 pAlgo->SetStatsLength(m_grid.DrawPath(aPath));

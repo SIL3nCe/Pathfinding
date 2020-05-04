@@ -12,8 +12,8 @@ public:
 private:
 	struct SDatas
 	{
-		bool bDiscovered;
-		std::pair<int, int> vParent;
+		bool bDiscovered = false;
+		std::pair<int, int> vParent = { -1, -1 };
 	};
 
 	std::vector<std::pair<int, int>> m_aNeighbours;

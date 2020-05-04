@@ -16,12 +16,12 @@ private:
 private:
 	struct SDatas
 	{
-		bool bClosed;
-		bool bQueued;
-		float fHeuristic; // h(n)
-		float fCost; // g(n)
-		float fScore; // f(n)
-		std::pair<int, int> vPrevious;
+		bool bClosed = false;
+		bool bQueued = false;
+		float fHeuristic = -1.0f; // h(n)
+		float fCost = static_cast<float>(UINT_MAX - 1); // g(n)
+		float fScore = static_cast<float>(UINT_MAX - 1); // f(n)
+		std::pair<int, int> vPrevious = { -1, -1 };
 	};
 	
 	std::vector<std::pair<int, int>> m_aNeighbours;

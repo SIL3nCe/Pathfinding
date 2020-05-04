@@ -6,21 +6,21 @@ using namespace std;
 
 bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /*= DefaultOnDoingOperation*/)
 {
+	// Init worker
 	vector<vector<SDatas>> aaWorker;
 
-	queue<pair<int, int>> aQueue;
-
-	for (int i = 0; i < Grid.GetHeight(); ++i)
+	int gridHeight = Grid.GetHeight();
+	int gridWidth = Grid.GetWidth();
+	for (int i = 0; i < gridHeight; ++i)
 	{
-		vector<SDatas> aLine(Grid.GetWidth());
-		for (int j = 0; j < Grid.GetWidth(); ++j)
-		{
-			aLine[j].bDiscovered = false;
-			aLine[j].vParent = { -1, -1 };
-		}
+		vector<SDatas> aLine(gridWidth);
 		aaWorker.push_back(aLine);
 	}
 
+	// Init queue
+	queue<pair<int, int>> aQueue;
+
+	// Setup start node
 	const pair<int, int>& vStart = Grid.GetStart();
 	aQueue.push(vStart);
 	aaWorker[vStart.first][vStart.second].bDiscovered = true;

@@ -15,6 +15,7 @@ enum class EOperations : unsigned int
 	ClosedNode
 };
 
+typedef void(*OnDoingOperationFctPtr)(EOperations, const std::pair<int, int>&);
 void DefaultOnDoingOperation(EOperations eOperation, const std::pair<int, int>& vCellCoord);
 
 struct SOperation

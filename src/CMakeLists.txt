@@ -15,3 +15,5 @@ add_executable(Pathfinding ${SRC_FILES})
 set(ImGui-SFML_DIR "C:/Program Files (x86)/imgui_sfml/lib/cmake/ImGui-SFML")
 find_package(ImGui-SFML REQUIRED)
 target_link_libraries(Pathfinding PRIVATE ImGui-SFML::ImGui-SFML)
+
+target_include_directories(Pathfinding PRIVATE "Algos" "View" "View/Algos")

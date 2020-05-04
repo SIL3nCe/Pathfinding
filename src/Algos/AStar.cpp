@@ -5,7 +5,7 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/A*_search_algorithm
 
-bool AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
+bool AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuristic, float fWeight, vector<pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /*= DefaultOnDoingOperation*/)
 {
 	vector<vector<SDatas>> aaWorker; //TODO Find a better way
 

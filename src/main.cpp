@@ -7,7 +7,6 @@ using namespace std;
 
 /*TODO
     -nbr de cases dynamique
-    -Comparaison des stats en lançant plusieurs algo en même temps
     -Trouver autre solution plus opti pour le gridworker
 
 *ALGOs

@@ -1,6 +1,12 @@
 #include "Pathfinding.h"
+
 #include "imgui.h"
 #include "imgui-SFML.h"
+
+#include "AlgoView.h"
+#include "AStarView.h"
+#include "DijkstraView.h"
+#include "BreadthFirstView.h"
 
 using namespace std;
 
@@ -10,30 +16,28 @@ Pathfinding::Pathfinding()
 : m_eState(EPathfindingState::GridUse)
 , m_grid()
 , m_eSelectedAlgo(EAlgorithms::AStar)
-, m_algo_Dijkstra()
-, m_bDijkstraUseDiagonal(true)
-, m_algo_BreadthFirst()
-, m_bBreadthFirstUseDiagonal(true)
-, m_algo_AStar()
-, m_bAStarUseDiagonal(true)
-, m_eAStartHeuristic(EHeuristic::Manhattan)
-, m_fAStarWeight(1.0f)
 , m_currentStep(0)
 , m_bRewind(false)
 , m_bPause(true)
 , m_frameBeforeDrawing(1)
 , m_operationsToDrawPerFrames(4)
 , m_frameCounter(0)
-, m_fTime(0.0f)
-, m_steps(0)
-, m_fLength(0.0f)
-, m_algoClock()
 {
     buttonPlay.loadFromFile("Resources\\play.png");
     buttonRewind.loadFromFile("Resources\\playrewind.png");
     buttonPause.loadFromFile("Resources\\pause.png");
     buttonNext.loadFromFile("Resources\\next.png");
     buttonPrevious.loadFromFile("Resources\\previous.png");
+
+    // Init in order of EAlgorithms
+    m_aAlgoViews.reserve(static_cast<int>(EAlgorithms::Max));
+
+    AStarView* pAStar = new AStarView();
+    m_aAlgoViews.push_back(pAStar);
+    DijkstraView* pDijkstra = new DijkstraView();
+    m_aAlgoViews.push_back(pDijkstra);
+    BreadthFirstView* pBreadthFirst = new BreadthFirstView();
+    m_aAlgoViews.push_back(pBreadthFirst);
 }
 
 void Pathfinding::Update(float dt)
@@ -66,25 +70,35 @@ void Pathfinding::Update(float dt)
 
         case EPathfindingState::ExecAlgo:
         {
-            m_algoClock.restart();
-
             GridWorker gridWorker(GRID_SIZE, GRID_SIZE, m_grid.GetStart(), m_grid.GetEnd());
             m_grid.FillGridWorker(&gridWorker);
             vector<pair<int, int>> aPath;
 
-            switch (m_eSelectedAlgo)
+            AlgoView* pAlgo = m_aAlgoViews[static_cast<int>(m_eSelectedAlgo)];
+            pAlgo->Execute(gridWorker, aPath, Pathfinding::OnDoingOperation);
+
+            pAlgo->SetStatsLength(m_grid.DrawPath(aPath));
+            pAlgo->SetStatsStep(m_aOperationStack.size());
+
+            SetState(EPathfindingState::GridUse);
+        }
+        break;
+        
+        case EPathfindingState::ExecAllAlgo:
+        {
+            GridWorker gridWorker(GRID_SIZE, GRID_SIZE, m_grid.GetStart(), m_grid.GetEnd());
+            m_grid.FillGridWorker(&gridWorker);
+            vector<pair<int, int>> aPath;
+
+            int i = 0;
+            for (AlgoView* pAlgo : m_aAlgoViews)
             {
-                case EAlgorithms::AStar: m_algo_AStar.Execute(gridWorker, m_bAStarUseDiagonal, m_eAStartHeuristic, m_fAStarWeight, aPath, Pathfinding::OnDoingOperation); break;
-                case EAlgorithms::Dijksta: m_algo_Dijkstra.Execute(gridWorker, m_bDijkstraUseDiagonal, aPath, Pathfinding::OnDoingOperation); break;
-                case EAlgorithms::BreadthFirst: m_algo_BreadthFirst.Execute(gridWorker, m_bBreadthFirstUseDiagonal, aPath, Pathfinding::OnDoingOperation); break;
+                pAlgo->Execute(gridWorker, aPath, i == static_cast<int>(m_eSelectedAlgo) ? Pathfinding::OnDoingOperation : DefaultOnDoingOperation);
+
+                pAlgo->SetStatsLength(m_grid.DrawPath(aPath));
+                pAlgo->SetStatsStep(m_aOperationStack.size());
+                i++;
             }
-
-            m_fLength = m_grid.DrawPath(aPath);
-
-            //Compute stats
-            m_fTime = m_algoClock.getElapsedTime().asSeconds();
-            m_fTime *= 1000.0f;
-            m_steps = m_aOperationStack.size();
 
             SetState(EPathfindingState::GridUse);
         }
@@ -122,27 +136,70 @@ bool Pathfinding::UndrawAStep()
     return false;
 }
 
+void Pathfinding::SetState(EPathfindingState eNewState)
+{
+    // Leave state
+    switch (m_eState)
+    {
+        case EPathfindingState::GridUse:
+        {
+            m_grid.ClearDebugInfo();
+            m_aOperationStack.clear();
+        }
+        break;
+
+        case EPathfindingState::ExecAlgo:
+        case EPathfindingState::ExecAllAlgo:
+        {
+            m_currentStep = 0;
+            m_bRewind = false;
+            m_bPause = false;
+        }
+        break;
+    }
+
+    m_eState = eNewState;
+
+    // Entering state
+    switch (m_eState)
+    {
+        case EPathfindingState::GridUse:
+        {
+        }
+        break;
+
+        case EPathfindingState::ExecAlgo:
+        case EPathfindingState::ExecAllAlgo:
+        {
+            for (AlgoView* pAlgo : m_aAlgoViews)
+            {
+                pAlgo->ResetStats();
+            }
+        }
+        break;
+    }
+}
+
 void Pathfinding::DrawGUI()
 {
     //
     //Statistics
     if (ImGui::Begin("Stats"))
     {
+        int nElements = static_cast<int>(EAlgorithms::Max);
+
+        ImGui::SetNextWindowContentSize(ImVec2(ImGui::GetFontSize() * 13.0f * nElements, 0.0f));
+        ImGui::BeginChild("##ScrollingRegion", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::Columns(nElements);
+
+        for (AlgoView* pAlgo : m_aAlgoViews)
         {
-            char buf[32];
-            sprintf(buf, "%.3f", m_fLength);
-            ImGui::LabelText(buf, "Length: ");
+            pAlgo->DrawGuiStatistics();
+            ImGui::NextColumn();
         }
-        {
-            char buf[32];
-            sprintf(buf, "%.3f", m_fTime);
-            ImGui::LabelText(buf, "Time (ms): ");
-        }
-        {
-            char buf[32];
-            sprintf(buf, "%d", m_steps);
-            ImGui::LabelText(buf, "Steps: ");
-        }
+
+        ImGui::EndChild();
+
     }
     ImGui::End();
 
@@ -151,63 +208,10 @@ void Pathfinding::DrawGUI()
     if (ImGui::Begin("Algorithms"))
     {
         ImGui::PushItemWidth(100.0f);
-        if (EAlgorithms::AStar == m_eSelectedAlgo)
-        {
-            ImGui::SetNextTreeNodeOpen(true);
-            if (ImGui::CollapsingHeader("A*"))
-            {
-                if (ImGui::RadioButton("Manhattan", m_eAStartHeuristic == EHeuristic::Manhattan))
-                    m_eAStartHeuristic = EHeuristic::Manhattan;
-                if (ImGui::RadioButton("Euclidean", m_eAStartHeuristic == EHeuristic::Euclidean))
-                    m_eAStartHeuristic = EHeuristic::Euclidean;
-                if (ImGui::RadioButton("Chebyshev", m_eAStartHeuristic == EHeuristic::Chebyshev))
-                    m_eAStartHeuristic = EHeuristic::Chebyshev;
 
-                ImGui::Checkbox("Use Diagonal", &m_bAStarUseDiagonal);
-                ImGui::InputFloat("Weight", &m_fAStarWeight);
-            }
-        }
-        else
+        for (AlgoView* pAlgo : m_aAlgoViews)
         {
-            ImGui::SetNextTreeNodeOpen(false);
-            if (ImGui::CollapsingHeader("A*", ImGuiTreeNodeFlags_Bullet))
-            {
-                m_eSelectedAlgo = EAlgorithms::AStar;
-            }
-        }
-
-        if (EAlgorithms::Dijksta == m_eSelectedAlgo)
-        {
-            ImGui::SetNextTreeNodeOpen(true);
-            if (ImGui::CollapsingHeader("Dijkstra"))
-            {
-                ImGui::Checkbox("Use Diagonal", &m_bDijkstraUseDiagonal);
-            }
-        }
-        else
-        {
-            ImGui::SetNextTreeNodeOpen(false);
-            if (ImGui::CollapsingHeader("Dijkstra", ImGuiTreeNodeFlags_Bullet))
-            {
-                m_eSelectedAlgo = EAlgorithms::Dijksta;
-            }
-        }
-        
-        if (EAlgorithms::BreadthFirst == m_eSelectedAlgo)
-        {
-            ImGui::SetNextTreeNodeOpen(true);
-            if (ImGui::CollapsingHeader("Breadth First"))
-            {
-                ImGui::Checkbox("Use Diagonal", &m_bBreadthFirstUseDiagonal);
-            }
-        }
-        else
-        {
-            ImGui::SetNextTreeNodeOpen(false);
-            if (ImGui::CollapsingHeader("Breadth First", ImGuiTreeNodeFlags_Bullet))
-            {
-                m_eSelectedAlgo = EAlgorithms::BreadthFirst;
-            }
+            pAlgo->DrawGuiAlgorithm(m_eSelectedAlgo);
         }
     }
     ImGui::End();
@@ -228,7 +232,7 @@ void Pathfinding::DrawGUI()
         {
             if (m_eState == EPathfindingState::GridUse)
             {
-                //TODO
+                SetState(EPathfindingState::ExecAllAlgo);
             }
         }
         ImGui::SameLine();
@@ -327,7 +331,11 @@ void Pathfinding::DrawGUI()
             DrawAStep();
         }
 
-        ImGui::Text("Last drawn operation: ");
+        {
+            char buf[32];
+            sprintf(buf, "Operation %d/%d : ", m_currentStep, m_aOperationStack.size());
+            ImGui::Text(buf);
+        }
         ImGui::SameLine();
         if (m_currentStep <= m_aOperationStack.size() && m_currentStep > 0)
         {
@@ -345,48 +353,6 @@ void Pathfinding::DrawGUI()
         ImGui::SliderInt("Operations per draw", &m_operationsToDrawPerFrames, 1, 20);
     }
     ImGui::End();
-}
-
-void Pathfinding::SetState(EPathfindingState eNewState)
-{
-    // Leave state
-    switch (m_eState)
-    {
-        case EPathfindingState::GridUse:
-        {
-            m_grid.ClearDebugInfo();
-            m_aOperationStack.clear();
-        }
-        break;
-
-        case EPathfindingState::ExecAlgo:
-        {
-            m_currentStep = 0;
-            m_bRewind = false;
-            m_bPause = false;
-        }
-        break;
-    }
-
-    m_eState = eNewState;
-
-    // Entering state
-    switch (m_eState)
-    {
-        case EPathfindingState::GridUse:
-        {
-
-        }
-        break;
-
-        case EPathfindingState::ExecAlgo:
-        {
-            m_fTime = 0.0f;
-            m_steps = 0;
-            m_fLength = 0.0f;
-        }
-        break;
-    }
 }
 
 void Pathfinding::OnKeyPressed(sf::Keyboard::Key eKey)

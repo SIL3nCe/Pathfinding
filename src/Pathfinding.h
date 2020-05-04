@@ -2,34 +2,37 @@
 
 #include "GridView.h"
 
-#include "Algo/Dijkstra.h"
-#include "Algo/BreadthFirst.h"
-#include "Algo/AStar.h"
+#include "Algos/Dijkstra.h"
+#include "Algos/BreadthFirst.h"
 
 enum class EPathfindingState
 {
 	GridUse,
 	ExecAlgo,
+	ExecAllAlgo,
 };
 
 enum class EAlgorithms
 {
 	AStar,
 	Dijksta,
-	BreadthFirst
+	BreadthFirst,
+
+	Max
 };
+
+class AlgoView;
 
 class Pathfinding
 {
 public:
-
 	Pathfinding();
 
 	void Update(float dt);
 
-	void Draw(sf::RenderWindow& window);
-
 	void SetState(EPathfindingState eNewState);
+
+	void Draw(sf::RenderWindow& window);
 
 	void OnKeyPressed(sf::Keyboard::Key eKey);
 
@@ -50,18 +53,10 @@ private:
 	GridView m_grid;
 
 	// Algos
+	std::vector<AlgoView*> m_aAlgoViews;
+
 	EAlgorithms m_eSelectedAlgo;
-	Dijkstra m_algo_Dijkstra;
-	bool m_bDijkstraUseDiagonal;
-
-	BreadthFirst m_algo_BreadthFirst;
-	bool m_bBreadthFirstUseDiagonal;
-
-	AStar m_algo_AStar;
-	bool m_bAStarUseDiagonal;
-	EHeuristic m_eAStartHeuristic;
-	float m_fAStarWeight;
-
+	
 	static std::vector<SOperation> m_aOperationStack;
 
 	// Operation drawing
@@ -78,10 +73,4 @@ private:
 	sf::Texture buttonPause;
 	sf::Texture buttonNext;
 	sf::Texture buttonPrevious;
-
-	// Statistics
-	float m_fTime;
-	int m_steps;
-	float m_fLength;
-	sf::Clock m_algoClock;
 };

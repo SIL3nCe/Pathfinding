@@ -4,7 +4,7 @@ using namespace std;
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 
-bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, void(*OnDoingOperation)(EOperations, const pair<int, int>&) /*= DefaultOnDoingOperation*/)
+bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /*= DefaultOnDoingOperation*/)
 {
 	vector<vector<SDatas>> aaWorker;
 

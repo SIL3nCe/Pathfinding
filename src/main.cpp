@@ -8,8 +8,6 @@ using namespace std;
 /*TODO
     -nbr de cases dynamique
     -Trouver autre solution plus opti pour le gridworker
-    -OnDoingOperationFctPtr en ExeclAll
-    -OnDoingOperation de Pathfinding pas static
 *ALGOs
     -Gérer bidirectionnel
     -Implem plus d'algo

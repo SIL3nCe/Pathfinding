@@ -19,7 +19,7 @@ bool AStar::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic eHeuri
 	}
 
 	// Init multiset
-	auto compare = [&aaWorker](const pair<int, int> & left, const pair<int, int> & right)
+	auto compare = [&aaWorker](const pair<int, int>& left, const pair<int, int>& right)
 	{
 		return aaWorker[left.first][left.second].fScore < aaWorker[right.first][right.second].fScore;
 	};

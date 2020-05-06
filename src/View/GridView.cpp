@@ -110,9 +110,8 @@ void GridView::FillGridWorker(GridWorker * grid)
 	}
 }
 
-float GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
+void GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
 {
-	float fLength = 0.0f;
 	m_aPath.clear();
 
 	int nNodes = aPath.size();
@@ -123,16 +122,9 @@ float GridView::DrawPath(const std::vector<std::pair<int, int>>& aPath)
 		{
 			m_aPath.push_back(sf::Vertex(vLocation, sf::Color::Magenta));
 		}
-
-		if (i > 0)
-		{
-			fLength += (aPath[i].first == aPath[i - 1].first || aPath[i].second == aPath[i - 1].second) ? 1.0f : SquareRootOf2;
-		}
 	}
 
 	m_bDrawPath = true;
-	
-	return fLength;
 }
 
 void GridView::SetDrawPath(bool bDraw)

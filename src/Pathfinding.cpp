@@ -11,6 +11,7 @@
 using namespace std;
 
 std::vector<SOperation> Pathfinding::m_aOperationStack;
+int Pathfinding::m_stepCounter = 0;
 
 Pathfinding::Pathfinding()
 : m_eState(EPathfindingState::GridUse)
@@ -70,15 +71,16 @@ void Pathfinding::Update(float dt)
 
         case EPathfindingState::ExecAlgo:
         {
-            GridWorker gridWorker(GRID_SIZE, GRID_SIZE, m_grid.GetStart(), m_grid.GetEnd());
+            GridWorker gridWorker(m_grid.GetWidth(), m_grid.GetHeight(), m_grid.GetStart(), m_grid.GetEnd());
             m_grid.FillGridWorker(&gridWorker);
             vector<pair<int, int>> aPath;
 
             AlgoView* pAlgo = m_aAlgoViews[static_cast<int>(m_eSelectedAlgo)];
             pAlgo->Execute(gridWorker, aPath, Pathfinding::OnDoingOperation);
 
-            pAlgo->SetStatsLength(m_grid.DrawPath(aPath));
+            m_grid.DrawPath(aPath);
             pAlgo->SetStatsStep(m_aOperationStack.size());
+            pAlgo->SetStatsLength(ComputePathLength(aPath));
 
             SetState(EPathfindingState::GridUse);
         }
@@ -86,18 +88,29 @@ void Pathfinding::Update(float dt)
         
         case EPathfindingState::ExecAllAlgo:
         {
-            GridWorker gridWorker(GRID_SIZE, GRID_SIZE, m_grid.GetStart(), m_grid.GetEnd());
+            GridWorker gridWorker(m_grid.GetWidth(), m_grid.GetHeight(), m_grid.GetStart(), m_grid.GetEnd());
             m_grid.FillGridWorker(&gridWorker);
             vector<pair<int, int>> aPath;
 
             int i = 0;
             for (AlgoView* pAlgo : m_aAlgoViews)
             {
-                //TODO give a OnDoingOperationFctPtr which will only count operations for stats
-                pAlgo->Execute(gridWorker, aPath, i == static_cast<int>(m_eSelectedAlgo) ? Pathfinding::OnDoingOperation : DefaultOnDoingOperation);
+                if (i == static_cast<int>(m_eSelectedAlgo))
+                {
+                    pAlgo->Execute(gridWorker, aPath, Pathfinding::OnDoingOperation);
 
-                pAlgo->SetStatsLength(m_grid.DrawPath(aPath));
-                pAlgo->SetStatsStep(m_aOperationStack.size());
+                    m_grid.DrawPath(aPath);
+                    pAlgo->SetStatsStep(m_aOperationStack.size());
+                }
+                else
+                {
+                    m_stepCounter = 0;
+                    pAlgo->Execute(gridWorker, aPath, Pathfinding::OnDoingOperationCounter);
+
+                    pAlgo->SetStatsStep(m_stepCounter);
+                }
+
+                pAlgo->SetStatsLength(ComputePathLength(aPath));
                 i++;
             }
 
@@ -356,6 +369,19 @@ void Pathfinding::DrawGUI()
     ImGui::End();
 }
 
+float Pathfinding::ComputePathLength(const vector<pair<int, int>>& aPath) const
+{
+    float fLength = 0.0f;
+
+    int nNodes = aPath.size();
+    for (int i = 1; i < nNodes; ++i)
+    {
+        fLength += (aPath[i].first == aPath[i - 1].first || aPath[i].second == aPath[i - 1].second) ? 1.0f : SquareRootOf2;
+    }
+
+    return fLength;
+}
+
 void Pathfinding::OnKeyPressed(sf::Keyboard::Key eKey)
 {
     if (sf::Keyboard::R == eKey)
@@ -415,4 +441,9 @@ void Pathfinding::OnMouseReleased()
 void Pathfinding::OnDoingOperation(EOperations eOperation, const std::pair<int, int>& vCellCoord)
 {
     m_aOperationStack.push_back({ eOperation, vCellCoord });
+}
+
+void Pathfinding::OnDoingOperationCounter(EOperations eOperation, const std::pair<int, int>& vCellCoord)
+{
+    m_stepCounter++;
 }

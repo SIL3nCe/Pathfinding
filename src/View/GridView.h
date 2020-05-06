@@ -14,15 +14,15 @@ class GridView
 public:
 	GridView();
 
-	void Draw(sf::RenderWindow & window);
-	
+	void Draw(sf::RenderWindow& window);
+
 	void Clear();
 	void ClearDebugInfo();
 	void Reset();
 
-	void FillGridWorker(GridWorker * pGrid);
+	void FillGridWorker(GridWorker* pGrid);
 
-	float DrawPath(const std::vector<std::pair<int, int>>& aPath);
+	void DrawPath(const std::vector<std::pair<int, int>>& aPath);
 	void SetDrawPath(bool bDraw);
 
 	void DoOperation(const SOperation& operation);
@@ -36,6 +36,9 @@ public:
 	bool GetScreenCoordFromCell(const std::pair<int, int>& vNode, sf::Vector2f& vLocation) const;
 
 	inline bool IsValidID(int x, int y) const;
+
+	const int GetWidth() const { return GRID_SIZE; }
+	const int GetHeight() const { return GRID_SIZE; }
 
 	const std::pair<int, int>& GetStart() const { return m_vStart; }
 	const std::pair<int, int>& GetEnd() const { return m_vEnd; }

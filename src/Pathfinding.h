@@ -41,11 +41,14 @@ public:
 	void OnMouseReleased();
 
 	static void OnDoingOperation(EOperations eOperation, const std::pair<int, int>& vCellCoord);
+	static void OnDoingOperationCounter(EOperations eOperation, const std::pair<int, int>& vCellCoord);
 
 private:
 	bool DrawAStep();
 	bool UndrawAStep();
 	void DrawGUI();
+
+	float ComputePathLength(const std::vector<std::pair<int, int>>& aPath) const;
 
 private:
 	EPathfindingState m_eState;
@@ -58,6 +61,7 @@ private:
 	EAlgorithms m_eSelectedAlgo;
 	
 	static std::vector<SOperation> m_aOperationStack;
+	static int m_stepCounter;
 
 	// Operation drawing
 	int m_currentStep;

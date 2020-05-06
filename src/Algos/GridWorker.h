@@ -6,9 +6,9 @@ class GridWorker
 {
 public:
 	GridWorker() = delete;
-	GridWorker(const GridWorker & grid) = delete;
+	GridWorker(const GridWorker& grid) = delete;
 	GridWorker(GridWorker&& grid) = delete;
-	GridWorker(int width, int height, const std::pair<int, int> & vStart, const std::pair<int, int> & vEnd);
+	GridWorker(int width, int height, const std::pair<int, int>& vStart, const std::pair<int, int>& vEnd);
 
 	std::vector<std::vector<bool>>& GetGridToFill();
 

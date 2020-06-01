@@ -1,32 +1,31 @@
-#include "AStarBidirView.h"
+#include "BeamSearchView.h"
 
-AStarBidirView::AStarBidirView()
+BeamSearchView::BeamSearchView()
 : m_algo()
 , m_bUseDiagonal(true)
 , m_eHeuristic(EHeuristic::Manhattan)
 , m_fWeight(1.0f)
+, m_beamWidth(20)
 {
 }
 
-bool AStarBidirView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /* = DefaultOnDoingOperation*/)
+bool BeamSearchView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /* = DefaultOnDoingOperation*/)
 {
     m_algoClock.restart();
-    //TODO exec bidirectionnal a*
-    //bool bRes = m_algo.Execute(Grid, m_bUseDiagonal, m_eHeuristic, m_fWeight, aFinalPath, OnDoingOperation);
-    bool bRes = false;
-   
+    bool bRes = m_algo.Execute(Grid, m_bUseDiagonal, m_eHeuristic, m_fWeight, m_beamWidth, aFinalPath, OnDoingOperation);
+
     m_fTime = m_algoClock.getElapsedTime().asSeconds();
     m_fTime *= 1000.0f;
 
     return bRes;
 }
 
-void AStarBidirView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
+void BeamSearchView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
 {
-    if (EAlgorithms::AStarBidir == eSelectedAlgo)
+    if (EAlgorithms::BeamSearch == eSelectedAlgo)
     {
         ImGui::SetNextTreeNodeOpen(true);
-        if (ImGui::CollapsingHeader("A* Bidir"))
+        if (ImGui::CollapsingHeader("Beam Search"))
         {
             if (ImGui::RadioButton("Manhattan", m_eHeuristic == EHeuristic::Manhattan))
                 m_eHeuristic = EHeuristic::Manhattan;
@@ -37,20 +36,21 @@ void AStarBidirView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
 
             ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
             ImGui::InputFloat("Weight", &m_fWeight);
+            ImGui::InputInt("Beam Width", &m_beamWidth);
         }
     }
     else
     {
         ImGui::SetNextTreeNodeOpen(false);
-        if (ImGui::CollapsingHeader("A* Bidir", ImGuiTreeNodeFlags_Bullet))
+        if (ImGui::CollapsingHeader("Beam Search", ImGuiTreeNodeFlags_Bullet))
         {
-            eSelectedAlgo = EAlgorithms::AStarBidir;
+            eSelectedAlgo = EAlgorithms::BeamSearch;
         }
     }
 }
 
-void AStarBidirView::DrawGuiStatistics()
+void BeamSearchView::DrawGuiStatistics()
 {
-    ImGui::Text("A* BiDir");
+    ImGui::Text("Beam Search");
     AlgoView::DrawGuiStatistics();
 }

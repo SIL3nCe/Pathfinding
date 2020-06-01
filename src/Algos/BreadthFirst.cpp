@@ -1,4 +1,5 @@
 #include "BreadthFirst.h"
+#include <queue>
 
 using namespace std;
 
@@ -48,7 +49,7 @@ bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pai
 		// Get its neihbours
 		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
 
-		// Compute distance to those neighbours
+		// Push neighbours
 		int nNeighbours = m_aNeighbours.size();
 		for (int i = 0; i < nNeighbours; ++i)
 		{

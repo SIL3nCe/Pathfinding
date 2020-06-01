@@ -2,7 +2,6 @@
 
 #include "GridWorker.h"
 #include "Utility.h"
-#include <queue>
 
 class BreadthFirst
 {

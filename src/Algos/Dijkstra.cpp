@@ -42,7 +42,6 @@ bool Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<in
 		if (vCurrentNode == Grid.GetEnd())
 		{
 			aFinalPath.clear();
-
 			while (vCurrentNode.first != -1)
 			{
 				aFinalPath.push_back(vCurrentNode);

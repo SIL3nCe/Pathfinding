@@ -8,6 +8,7 @@
 #include "AStarBidirView.h"
 #include "DijkstraView.h"
 #include "BreadthFirstView.h"
+#include "BeamSearchView.h"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ Pathfinding::Pathfinding()
     m_aAlgoViews.push_back(new AStarBidirView());
     m_aAlgoViews.push_back(new DijkstraView());
     m_aAlgoViews.push_back(new BreadthFirstView());
+    m_aAlgoViews.push_back(new BeamSearchView());
 }
 
 Pathfinding::~Pathfinding()
@@ -98,11 +100,12 @@ void Pathfinding::Update(float dt)
         {
             GridWorker gridWorker(m_grid.GetWidth(), m_grid.GetHeight(), m_grid.GetStart(), m_grid.GetEnd());
             m_grid.FillGridWorker(&gridWorker);
-            vector<pair<int, int>> aPath;
 
             int i = 0;
             for (AlgoView* pAlgo : m_aAlgoViews)
             {
+                vector<pair<int, int>> aPath;
+
                 if (i == static_cast<int>(m_eSelectedAlgo))
                 {
                     pAlgo->Execute(gridWorker, aPath, Pathfinding::OnDoingOperation);

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "AlgoView.h"
-#include "BreadthFirst.h"
+#include "AStar.h"
 
-class BreadthFirstView : public AlgoView
+class AStarBidirView : public AlgoView
 {
 public:
-	BreadthFirstView();
+	AStarBidirView();
 
 	bool Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation = DefaultOnDoingOperation) override;
 
@@ -14,8 +14,11 @@ public:
 	void DrawGuiStatistics() override;
 
 private:
-	BreadthFirst m_algo;
-	
+	AStar m_algo;
+
+	// Options
 	bool m_bUseDiagonal;
+	EHeuristic m_eHeuristic;
+	float m_fWeight;
 };
 

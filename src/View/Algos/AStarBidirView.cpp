@@ -1,6 +1,6 @@
-#include "AStarView.h"
+#include "AStarBidirView.h"
 
-AStarView::AStarView()
+AStarBidirView::AStarBidirView()
 : m_algo()
 , m_bUseDiagonal(true)
 , m_eHeuristic(EHeuristic::Manhattan)
@@ -8,10 +8,12 @@ AStarView::AStarView()
 {
 }
 
-bool AStarView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /* = DefaultOnDoingOperation*/)
+bool AStarBidirView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /* = DefaultOnDoingOperation*/)
 {
     m_algoClock.restart();
-    bool bRes = m_algo.Execute(Grid, m_bUseDiagonal, m_eHeuristic, m_fWeight, aFinalPath, OnDoingOperation);
+    //TODO exec bidirectionnal a*
+    //bool bRes = m_algo.Execute(Grid, m_bUseDiagonal, m_eHeuristic, m_fWeight, aFinalPath, OnDoingOperation);
+    bool bRes = false;
    
     m_fTime = m_algoClock.getElapsedTime().asSeconds();
     m_fTime *= 1000.0f;
@@ -19,12 +21,11 @@ bool AStarView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>
     return bRes;
 }
 
-void AStarView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
+void AStarBidirView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
 {
-    if (EAlgorithms::AStar == eSelectedAlgo)
+    if (EAlgorithms::AStarBidir == eSelectedAlgo)
     {
-        ImGui::SetNextTreeNodeOpen(true);
-        if (ImGui::CollapsingHeader("A*"))
+        if (ImGui::CollapsingHeader("A* Bidir"))
         {
             if (ImGui::RadioButton("Manhattan", m_eHeuristic == EHeuristic::Manhattan))
                 m_eHeuristic = EHeuristic::Manhattan;
@@ -40,15 +41,15 @@ void AStarView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
     else
     {
         ImGui::SetNextTreeNodeOpen(false);
-        if (ImGui::CollapsingHeader("A*", ImGuiTreeNodeFlags_Bullet))
+        if (ImGui::CollapsingHeader("A* Bidir", ImGuiTreeNodeFlags_Bullet))
         {
-            eSelectedAlgo = EAlgorithms::AStar;
+            eSelectedAlgo = EAlgorithms::AStarBidir;
         }
     }
 }
 
-void AStarView::DrawGuiStatistics()
+void AStarBidirView::DrawGuiStatistics()
 {
-    ImGui::Text("A*");
+    ImGui::Text("A* BiDir");
     AlgoView::DrawGuiStatistics();
 }

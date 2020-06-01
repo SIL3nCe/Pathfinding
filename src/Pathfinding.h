@@ -2,9 +2,6 @@
 
 #include "GridView.h"
 
-#include "Algos/Dijkstra.h"
-#include "Algos/BreadthFirst.h"
-
 enum class EPathfindingState
 {
 	GridUse,
@@ -15,6 +12,7 @@ enum class EPathfindingState
 enum class EAlgorithms
 {
 	AStar,
+	AStarBidir,
 	Dijksta,
 	BreadthFirst,
 
@@ -27,6 +25,7 @@ class Pathfinding
 {
 public:
 	Pathfinding();
+	~Pathfinding();
 
 	void Update(float dt);
 

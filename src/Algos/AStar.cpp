@@ -99,11 +99,11 @@ float AStar::ComputeHeuristic(const pair<int, int>& start, const pair<int, int>&
 {
 	switch (eHeuristic)
 	{
-		case EHeuristic::Manhattan: { return Utility::GetManhattanDistance(start, end) * fWeight; };
-		case EHeuristic::Euclidean: { return Utility::GetEuclideanDistance(start, end) * fWeight; };
-		case EHeuristic::Chebyshev: {return Utility::GetChebyshevDistance(start, end) * fWeight; };
-		case EHeuristic::Null: { return 0; };
+		case EHeuristic::Manhattan: return Utility::GetManhattanDistance(start, end) * fWeight;
+		case EHeuristic::Euclidean: return Utility::GetEuclideanDistance(start, end) * fWeight;
+		case EHeuristic::Chebyshev: return Utility::GetChebyshevDistance(start, end) * fWeight;
+		case EHeuristic::Null: return 0.0f;
 	}
 
-	return 0;
+	return 0.0f;
 }

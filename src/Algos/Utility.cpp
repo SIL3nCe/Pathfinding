@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+
 using namespace std;
 
 const pair<int, int> Utility::CellTop(-1, 0);
@@ -14,9 +15,9 @@ const pair<int, int> Utility::CellTopRight(-1, 1);
 const pair<int, int> Utility::CellBottomLeft(1, -1);
 const pair<int, int> Utility::CellBottomRight(1, 1);
 
-std::pair<int, int> operator+(const std::pair<int, int>& l, const std::pair<int, int>& r)
+pair<int, int> operator+(const pair<int, int>& l, const pair<int, int>& r)
 {
-	return std::make_pair(l.first + r.first, l.second + r.second);
+	return make_pair(l.first + r.first, l.second + r.second);
 }
 
 void DefaultOnDoingOperation(EOperations eOperation, const std::pair<int, int>& vCellCoord)

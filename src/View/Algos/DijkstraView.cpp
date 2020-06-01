@@ -5,14 +5,14 @@
 
 DijkstraView::DijkstraView()
 : m_algo()
-, m_bDijkstraUseDiagonal(true)
+, m_bUseDiagonal(true)
 {
 }
 
 bool DijkstraView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /* = DefaultOnDoingOperation*/)
 {
     m_algoClock.restart();
-    bool bRes = m_algo.Execute(Grid, m_bDijkstraUseDiagonal, aFinalPath, OnDoingOperation);
+    bool bRes = m_algo.Execute(Grid, m_bUseDiagonal, aFinalPath, OnDoingOperation);
 
     m_fTime = m_algoClock.getElapsedTime().asSeconds();
     m_fTime *= 1000.0f;
@@ -27,7 +27,7 @@ void DijkstraView::DrawGuiAlgorithm(EAlgorithms& eSelectedAlgo)
         ImGui::SetNextTreeNodeOpen(true);
         if (ImGui::CollapsingHeader("Dijkstra"))
         {
-            ImGui::Checkbox("Use Diagonal", &m_bDijkstraUseDiagonal);
+            ImGui::Checkbox("Use Diagonal", &m_bUseDiagonal);
         }
     }
     else

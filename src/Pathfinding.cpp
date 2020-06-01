@@ -5,6 +5,7 @@
 
 #include "AlgoView.h"
 #include "AStarView.h"
+#include "AStarBidirView.h"
 #include "DijkstraView.h"
 #include "BreadthFirstView.h"
 
@@ -33,12 +34,19 @@ Pathfinding::Pathfinding()
     // Init in order of EAlgorithms
     m_aAlgoViews.reserve(static_cast<int>(EAlgorithms::Max));
 
-    AStarView* pAStar = new AStarView();
-    m_aAlgoViews.push_back(pAStar);
-    DijkstraView* pDijkstra = new DijkstraView();
-    m_aAlgoViews.push_back(pDijkstra);
-    BreadthFirstView* pBreadthFirst = new BreadthFirstView();
-    m_aAlgoViews.push_back(pBreadthFirst);
+    m_aAlgoViews.push_back(new AStarView());
+    m_aAlgoViews.push_back(new AStarBidirView());
+    m_aAlgoViews.push_back(new DijkstraView());
+    m_aAlgoViews.push_back(new BreadthFirstView());
+}
+
+Pathfinding::~Pathfinding()
+{
+    for (AlgoView* pAlgo : m_aAlgoViews)
+    {
+        delete(pAlgo);
+    }
+    m_aAlgoViews.clear();
 }
 
 void Pathfinding::Update(float dt)

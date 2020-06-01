@@ -17,6 +17,6 @@ private:
 	Dijkstra m_algo;
 
 	// Options
-	bool m_bDijkstraUseDiagonal;
+	bool m_bUseDiagonal;
 };
 

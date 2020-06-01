@@ -2,7 +2,9 @@
 
 #include "../Pathfinding.h"
 #include "GridWorker.h"
-#include <SFML/Window.hpp>
+
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 enum class EAlgorithms;
 

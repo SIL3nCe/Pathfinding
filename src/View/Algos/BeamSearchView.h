@@ -14,7 +14,6 @@ public:
 	void DrawGuiStatistics() override;
 
 private:
-	BeamSearch m_algo;
 
 	bool m_bUseDiagonal;
 	EHeuristic m_eHeuristic;

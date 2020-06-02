@@ -14,8 +14,7 @@ public:
 	void DrawGuiStatistics() override;
 
 private:
-	BreadthFirst m_algo;
-	
+
 	bool m_bUseDiagonal;
 };
 

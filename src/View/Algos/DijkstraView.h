@@ -14,9 +14,7 @@ public:
 	void DrawGuiStatistics() override;
 
 private:
-	Dijkstra m_algo;
 
-	// Options
 	bool m_bUseDiagonal;
 };
 

@@ -4,15 +4,14 @@
 #include "imgui-SFML.h"
 
 DijkstraView::DijkstraView()
-: m_algo()
-, m_bUseDiagonal(true)
+: m_bUseDiagonal(true)
 {
 }
 
 bool DijkstraView::Execute(const GridWorker& Grid, std::vector<std::pair<int, int>>& aFinalPath, OnDoingOperationFctPtr OnDoingOperation /* = DefaultOnDoingOperation*/)
 {
     m_algoClock.restart();
-    bool bRes = m_algo.Execute(Grid, m_bUseDiagonal, aFinalPath, OnDoingOperation);
+    bool bRes = Dijkstra::Execute(Grid, m_bUseDiagonal, aFinalPath, OnDoingOperation);
 
     m_fTime = m_algoClock.getElapsedTime().asSeconds();
     m_fTime *= 1000.0f;

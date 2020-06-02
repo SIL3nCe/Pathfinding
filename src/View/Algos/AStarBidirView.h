@@ -14,9 +14,7 @@ public:
 	void DrawGuiStatistics() override;
 
 private:
-	AStar m_algo;
 
-	// Options
 	bool m_bUseDiagonal;
 	EHeuristic m_eHeuristic;
 	float m_fWeight;

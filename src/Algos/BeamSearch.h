@@ -23,6 +23,4 @@ private:
 		float fScore = static_cast<float>(UINT_MAX - 1); // f(n)
 		std::pair<int, int> vPrevious = { -1, -1 };
 	};
-
-	std::vector<std::pair<int, int>> m_aNeighbours;
 };

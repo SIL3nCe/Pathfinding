@@ -31,6 +31,7 @@ bool Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<in
 	aaWorker[vStart.first][vStart.second].fDistance = 0.0f;
 	aPrioQueue.push(vStart);
 
+	vector<pair<int, int>> aNeighbours;
 	pair<int, int> vCurrentNode;
 
 	while (aPrioQueue.size() != 0)
@@ -52,13 +53,13 @@ bool Dijkstra::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pair<in
 		}
 
 		// Get its neihbours
-		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
+		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, aNeighbours);
 
 		// Compute distance to those neighbours
-		int nNeighbours = m_aNeighbours.size();
+		int nNeighbours = aNeighbours.size();
 		for (int i = 0; i < nNeighbours; ++i)
 		{
-			const pair<int, int>& vNode = m_aNeighbours[i];
+			const pair<int, int>& vNode = aNeighbours[i];
 
 			if (aaWorker[vNode.first][vNode.second].bQueued)
 				continue;

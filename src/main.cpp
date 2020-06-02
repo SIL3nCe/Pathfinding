@@ -8,8 +8,11 @@ using namespace std;
 /*TODO
     -nbr de cases dynamique
     -Trouver autre solution plus opti pour le gridworker
+    -namespace à la place de class pour tous les algo
+    -option pour trier les stats des algo par temps quand execall
+    -mettre les stats de l'algo exec en premier quand exec simple
 *ALGOs
-    -Gérer bidirectionnel
+    -Gérer bidirectionnel partout
     -Implem plus d'algo
 */
 

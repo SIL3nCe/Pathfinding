@@ -14,6 +14,4 @@ private:
 		bool bDiscovered = false;
 		std::pair<int, int> vParent = { -1, -1 };
 	};
-
-	std::vector<std::pair<int, int>> m_aNeighbours;
 };

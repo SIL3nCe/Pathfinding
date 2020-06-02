@@ -35,6 +35,7 @@ bool BeamSearch::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic e
 	aPrioSet.insert(vStart);
 	OnDoingOperation(EOperations::QueuedNode, vStart);
 
+	vector<pair<int, int>> aNeighbours;
 	pair<int, int> vCurrentNode;
 
 	while (aPrioSet.size() != 0)
@@ -59,13 +60,13 @@ bool BeamSearch::Execute(const GridWorker& Grid, bool bUseDiagonal, EHeuristic e
 		}
 
 		// Get neighbours
-		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
+		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, aNeighbours);
 
 		// Compute distance to those neighbours
-		int nNeighbours = m_aNeighbours.size();
+		int nNeighbours = aNeighbours.size();
 		for (int i = 0; i < nNeighbours; ++i)
 		{
-			const pair<int, int>& vNode = m_aNeighbours[i];
+			const pair<int, int>& vNode = aNeighbours[i];
 
 			SDatas* pData = &aaWorker[vNode.first][vNode.second];
 

@@ -26,6 +26,7 @@ bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pai
 	aQueue.push(vStart);
 	aaWorker[vStart.first][vStart.second].bDiscovered = true;
 
+	vector<pair<int, int>> aNeighbours;
 	pair<int, int> vCurrentNode;
 
 	while (!aQueue.empty())
@@ -47,13 +48,13 @@ bool BreadthFirst::Execute(const GridWorker& Grid, bool bUseDiagonal, vector<pai
 		}
 
 		// Get its neihbours
-		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, m_aNeighbours);
+		Grid.ComputeNeighboursOfCurrent(vCurrentNode, bUseDiagonal, aNeighbours);
 
 		// Push neighbours
-		int nNeighbours = m_aNeighbours.size();
+		int nNeighbours = aNeighbours.size();
 		for (int i = 0; i < nNeighbours; ++i)
 		{
-			const pair<int, int>& vNode = m_aNeighbours[i];
+			const pair<int, int>& vNode = aNeighbours[i];
 
 			if (!aaWorker[vNode.first][vNode.second].bDiscovered)
 			{

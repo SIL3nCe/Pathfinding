@@ -37,8 +37,8 @@ public:
 
 	inline bool IsValidID(int x, int y) const;
 
-	const int GetWidth() const { return GRID_SIZE; }
-	const int GetHeight() const { return GRID_SIZE; }
+	int GetWidth() const { return GRID_SIZE; }
+	int GetHeight() const { return GRID_SIZE; }
 
 	const std::pair<int, int>& GetStart() const { return m_vStart; }
 	const std::pair<int, int>& GetEnd() const { return m_vEnd; }

@@ -8,6 +8,7 @@
 #include "AStarBidirView.h"
 #include "DijkstraView.h"
 #include "BreadthFirstView.h"
+#include "DepthFirstView.h"
 #include "BeamSearchView.h"
 
 using namespace std;
@@ -39,6 +40,7 @@ Pathfinding::Pathfinding()
     m_aAlgoViews.push_back(new AStarBidirView());
     m_aAlgoViews.push_back(new DijkstraView());
     m_aAlgoViews.push_back(new BreadthFirstView());
+    m_aAlgoViews.push_back(new DepthFirstView());
     m_aAlgoViews.push_back(new BeamSearchView());
 }
 

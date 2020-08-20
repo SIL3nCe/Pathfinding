@@ -15,6 +15,7 @@ enum class EAlgorithms
 	AStarBidir,
 	Dijksta,
 	BreadthFirst,
+	DepthFirst,
 	BeamSearch,
 
 	Max
